@@ -1,4 +1,5 @@
 const express = require('express');
+const app = express();
 const bodyParser = require('body-parser');
 const router = express.Router();
 const ds = require('./datastore');
@@ -99,7 +100,6 @@ router.get('/', checkJwt, function(req, res){
 });
 
 
-
 //
 // delete lab
 //
@@ -108,7 +108,6 @@ router.delete('/:lab_id', checkJwt, function(req, res, err){
   console.log("In DELETE /labs/:lab_id "+req.params.lab_id )
   const key = datastore.key([LAB, parseInt(req.params.lab_id,10)]);
 
-
   u.check(key).then((lab)=>{
     console.log('In router.delete  ' + JSON.stringify(lab[0].owner) + "user id " +req.user.sub );  
    
@@ -116,14 +115,14 @@ router.delete('/:lab_id', checkJwt, function(req, res, err){
       res.status(403).send(u.msg_403());
       console.log ("it's null");
     }else  if (lab[0].owner != req.user.sub)  {
-      res.status(403).send(u.msg_403());
+      res.status(401).send(u.msg_401());
     }else {
       u.delete_l(key).then(res.status(204).end())
     }
   //error thrown from check
   }).catch((err)=>{
     console.log('In router.delete  caught ' + err); 
-    res.status(403).send(u.msg_403());
+    res.status(502).send(u.msg_502());
 }); 
  
 });

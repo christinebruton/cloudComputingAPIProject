@@ -167,7 +167,7 @@ async function get_labs(req,owner){
         q = q.start(req.query.cursor);
     }
 	const entities = await datastore.runQuery(q);
-    results.items = entities[0].map(ds.fromDatastore).filter(item => item.owner === owner);
+    results.labs = entities[0].map(ds.fromDatastore).filter(item => item.owner === owner);
     if (entities[1].moreResults !== ds.Datastore.NO_MORE_RESULTS) {
         results.next = req.protocol + "://" + req.get("host") + req.baseUrl + "?cursor=" + entities[1].endCursor;
     }
@@ -188,12 +188,11 @@ errorMsg = {
     msg_400 : function(){
         return {"Error":"The request does not meet the requirements"};
     },
- 
-    msg_403: function(){
-        return {"Error":"That name already exists"};
+    msg_401 : function(){
+        return {"Error":"Missing or invalid JWT"};
     },
-    msg_404: function(){
-        return {"Error":"No entity with this id exists"};
+    msg_403: function(){
+        return {"Error":"This is a violation of the uniqueness constraint"};
     },
     msg_405: function(){
         return {"Error":"Method cannot be used at this endpoint "};
@@ -206,6 +205,9 @@ errorMsg = {
     },
     msg_500: function(){
         return {"Error":"Internal Server Error"};
+    },
+    msg_502: function(){
+        return {"Error":"Invalid request"};
     },
 }
 
@@ -222,6 +224,7 @@ module.exports.msg_405=errorMsg.msg_405;
 module.exports.msg_406=errorMsg.msg_406;
 module.exports.msg_415=errorMsg.msg_415;
 module.exports.msg_500=errorMsg.msg_500; 
+module.exports.msg_502=errorMsg.msg_502; 
 //-------------------
 module.exports.u_name=unique_query;
 module.exports.gls=get_labs;
