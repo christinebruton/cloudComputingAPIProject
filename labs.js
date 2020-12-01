@@ -65,7 +65,7 @@ if (!u.l_SF_t_v(req)){
     if (bool == false){
         res.status(403).send(u.msg_403()); 
     }else if(bool == true) {
-      u.pl(req.body.name, req.body.containment_level, req.body.square_footage, req.user.sub)  
+      u.pl(req.body.name, req.body.containment_level, req.body.square_footage, req.user.sub, req.user)  
    
         .then( key=>
            //send formatted json back with 200 message

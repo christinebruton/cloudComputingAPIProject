@@ -94,7 +94,6 @@ router.get('/', checkJwt, function(req, res){
 router.get('/:agent_id', checkJwt, function(req, res, next){
   console.log ("in get/agent id " + req.params.agent_id)
   const agent_key = datastore.key([AGENT, parseInt(req.params.agent_id,10)]);
-  const sci_key = datastore.key([SCIENTIST, parseInt(req.params.lab_id,10)]);
   
   console.log ("in get: agent id key " + JSON.stringify(agent_key));
  

@@ -21,7 +21,8 @@ router.use(bodyParser.json());
 
 // formats and returns a lab
 
-function pass_a_lab(lab, req){
+async function pass_a_lab(lab, req){
+    
     queryData = {
        id: req.params.id,
        name: lab[0]['name'],
@@ -135,9 +136,32 @@ async function put_agent_lab(b_id, l_id){
 //
 // LAB POST HELPER FUNCTION
 // Takes in parameters and saves lab entity in datastore
+// also posts owner as a scientist if it isn't already listed in the db
 //
 
-async function post_lab(name, containment_level, square_footage, owner){
+async function post_lab(name, containment_level, square_footage, owner, user){
+
+    var noDupSci;
+    console.log("user "+ JSON.stringify(user))
+    //see if req.user.sub exists
+    noDupSci = await scientist_find(owner)
+    console.log ("No scientist in the db yet, ok to add  " + JSON.stringify(noDupSci))
+    //if a scientist does exist does just add it as an owner in the lab
+    if (noDupSci == false){
+            //move on with function
+    }else if (noDupSci == true)
+    //if scientist doesn't exist
+    {
+        post_scientist(user,owner)
+    }
+    //call a functon to post the scientist to the database
+    
+
+    //package and send lab info back
+
+    //inside .then
+
+
     console.log ("post_lab: owner "+ owner);
     var key = datastore.key(LAB);
 	const new_lab = {"name": name, "containment_level": containment_level, "square_footage": square_footage,  "owner":owner };
@@ -201,7 +225,7 @@ function containment_level_validation(req){
 //
 
 async function unique_query(req){
-
+    
     var name_is_unique;
     const query = datastore
     .createQuery('Lab')
@@ -403,22 +427,31 @@ async function get_agents(req,owner){
 //**********************************************************************************/
 
 
-async function post_scientist(name, id){
-    console.log ("post_scientist: "+ name);
+async function post_scientist(user, id){
+    console.log ("post_scientist: "+ user.name);
     var key = datastore.key(SCIENTIST);
-	const new_agent = {"name": name,"id": id };
+	const new_agent = {"name": user.name,"id": id };
     await datastore.save({ "key": key, "data": new_agent });
     return key;
 }
 
-async function check_for_double(keyObj){
-    const entity = await datastore.get(keyObj);
-    if (typeof(entity) !== 'undefined'){
-        return false;
+
+//used to find out if it's ok to add a new scientst to the db
+async function scientist_find(owner){
+    console.log("In scientist_find req.owner_id "+ owner )
+    var can_add_sci;
+    const query = datastore
+    .createQuery('Scientist')
+    .filter('id', '=', owner)
+
+    const [scientists] =  await datastore.runQuery(query);
+    num_of_sci=scientists.length;
+    if (num_of_sci > 0){
+        can_add_sci =  false;
+    }else if (num_of_labs == 0){
+        can_add_sci = true;
     }
-    else {
-        return true;
-    }
+ return can_add_sci
 }
 
 
@@ -511,6 +544,6 @@ module.exports.pass_a=pass_agent;
 
 module.exports.gss=get_scientists;
 module.exports.ps=post_scientist;
-module.exports.c_f_d=check_for_double
+//module.exports.c_f_d=check_for_double
 
 module.exports.p_l_a=put_lab_agent;
