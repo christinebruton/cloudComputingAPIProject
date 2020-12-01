@@ -298,6 +298,22 @@ function risk_group_validation(req){
 //**********************************************************************************/
 
 
+
+// formats and returns a lab
+
+function pass_agent(agent, req){
+    queryData = {
+       id: req.params.id,
+       name: agent[0]['name'],
+       risk_group: agent[0].risk_group,
+       type: agent[0].type,
+       owner: agent[0].owner,
+       owner: agent[0].lab,
+       self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + req.params.id 
+   };
+   return queryData;
+}
+
 //
 // INPUT VALIDATION
 // FOR AGENT checks to make sure all risk group level is one of 4 types:
@@ -327,6 +343,17 @@ async function post_agent(name, lab, risk_group, type, owner){
     await datastore.save({ "key": key, "data": new_agent });
     return key;
 }
+
+
+
+//delete agent helper
+function delete_agent(keyObj){
+    console.log ("delet_agent "+ JSON.stringify(keyObj))
+       return datastore.delete(keyObj);
+}
+
+
+
 
 //
 // used with POST to return formatted agent info
@@ -374,9 +401,32 @@ async function get_agents(req,owner){
 //**********************************************************************************/
 //          SCIENTIST HELPER FUNCTIONS
 //**********************************************************************************/
+
+
+async function post_scientist(name, id){
+    console.log ("post_scientist: "+ name);
+    var key = datastore.key(SCIENTIST);
+	const new_agent = {"name": name,"id": id };
+    await datastore.save({ "key": key, "data": new_agent });
+    return key;
+}
+
+async function check_for_double(keyObj){
+    const entity = await datastore.get(keyObj);
+    if (typeof(entity) !== 'undefined'){
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+
+
+
 //TODO: change from boats to scientists
 async function get_scientists(req){
-    var q = datastore.createQuery(BOAT).limit(4);
+    var q = datastore.createQuery(SCIENTIST).limit(5);
     const results = {};
     if(Object.keys(req.query).includes("cursor")){ //if there is a cursor
         q = q.start(req.query.cursor); //set the start point of the query to that cursor location
@@ -452,11 +502,15 @@ module.exports.ret_l=return_posted_lab_data;
 module.exports.check=check_if_entity_exists;
 
 module.exports.gas=get_agents;
+module.exports.delete_a=delete_agent;
 module.exports.a_p_ok = agent_params_ok;
 module.exports.r_g_v=risk_group_validation;
 module.exports.ret_a=return_posted_agent_data;
 module.exports.pa=post_agent;
+module.exports.pass_a=pass_agent;
 
-module.exports.gss=get_scientists
+module.exports.gss=get_scientists;
+module.exports.ps=post_scientist;
+module.exports.c_f_d=check_for_double
 
 module.exports.p_l_a=put_lab_agent;

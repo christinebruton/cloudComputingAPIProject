@@ -121,13 +121,6 @@ router.get('/:lab_id', checkJwt, function(req, res, next){
 });
 
 
-
-
-
-
-
-
-
 //
 // delete lab
 //

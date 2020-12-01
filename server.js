@@ -52,7 +52,7 @@ app.use(function (err, req, res, next) {
     }
    //GET unauthorized token   
     else if(err.name === 'UnauthorizedError' && req.method == "GET" && !req.originalUrl.includes("owner")) {
-     console.log ("UnauthorizedError: Get/BOATS" + JSON.stringify(req.originalUrl) + "contains owners " + req.originalUrl.includes("owner"));
+     console.log ("UnauthorizedError: Get/BOATS" + JSON.stringify(req.originalUrl) + " contains owners " + req.originalUrl.includes("owner"));
      const boats = u.gpb(req_owner_id)
      .then( (boats) => {
            res.status(200).json(boats);
