@@ -427,10 +427,10 @@ async function get_agents(req,owner){
 //**********************************************************************************/
 
 
-async function post_scientist(user, id){
-    console.log ("post_scientist: "+ user.name);
+async function post_scientist(user, owner){
+    console.log ("post_scientist: user.name "+ user.name + "user "+ JSON.stringify(user));
     var key = datastore.key(SCIENTIST);
-	const new_agent = {"name": user.name,"id": id };
+	const new_agent = {"name": user.name,"user_id": owner };
     await datastore.save({ "key": key, "data": new_agent });
     return key;
 }
@@ -457,15 +457,14 @@ async function scientist_find(owner){
 
 
 
-//TODO: change from boats to scientists
 async function get_scientists(req){
     var q = datastore.createQuery(SCIENTIST).limit(5);
     const results = {};
     if(Object.keys(req.query).includes("cursor")){ //if there is a cursor
         q = q.start(req.query.cursor); //set the start point of the query to that cursor location
     }
-	const entities = await datastore.runQuery(q);
-    results.allScientists = entities[0].map(ds.fromDatastore);
+    const entities = await datastore.runQuery(q);
+    results.all_scientists = entities[0];
     if (entities[1].moreResults !== ds.Datastore.NO_MORE_RESULTS) {
         results.next = req.protocol + "://" + req.get("host") + req.baseUrl + "?cursor=" + entities[1].endCursor;
     }
@@ -542,7 +541,7 @@ module.exports.ret_a=return_posted_agent_data;
 module.exports.pa=post_agent;
 module.exports.pass_a=pass_agent;
 
-module.exports.gss=get_scientists;
+module.exports.get_sci=get_scientists;
 module.exports.ps=post_scientist;
 //module.exports.c_f_d=check_for_double
 

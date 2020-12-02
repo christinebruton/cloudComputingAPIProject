@@ -19,7 +19,7 @@ router.use(bodyParser.json());
 
 //get route
 router.get('/', function(req, res){
-    const scientists = get_scientists(req)
+    const scientists = u.get_sci(req)
 	.then( (scientists) => {
         res.status(200).json(scientists);
     });
