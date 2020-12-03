@@ -127,7 +127,7 @@ function put_lab_agent(l_id, a_id){
 //put lab into agent 
 async function put_agent_lab(b_id, l_id){
     const a_key = datastore.key([AGENT, parseInt(a_id,10)]);
-    const b_key = datastore.key([LAB, parseInt(l_id,10)]);
+    const l_key = datastore.key([LAB, parseInt(l_id,10)]);
     const load = await datastore.get(a_key);
     agent[0].lab.id = l_id;
     console.log("put_agent_lab after agent[0].carrier.id = l_id " + JSON.stringify(agent));
@@ -377,6 +377,75 @@ function count_keys_agent(req_body){
     }
 }
 
+//
+// LAB: which keys to update
+//
+async function which_keys_to_update(req){
+   
+    var key_array = Object.keys(req.body);
+    var reqBody = req.body;
+    const l_key = datastore.key([LAB, parseInt(req.params.lab_id,10)]);
+    const lab  = await datastore.get(l_key);
+    var name_var, containment_level_var, square_footage_var, owner_var ;
+
+    //    
+    //Check for Name
+    //
+    //if there is not a name in request
+    if (typeof(reqBody.name) === 'undefined'){
+        //load the current value back into name var for later use
+        name_var=lab[0].name;
+    //if there is a name in the request
+    }else if (typeof(lab[0].name) !== 'undefined'){
+    //load the new name into name var
+        name_var=reqBody.name 
+    }
+
+    //    
+    //Check for containment_level
+    //
+    if (typeof(reqBody.containment_level) === 'undefined'){
+        containment_level_var = lab[0].containment_level;
+    //if array includes name, load req param into variable
+    }else if (typeof(reqBody.containment_level) !== 'undefined'){
+        containment_level_var = reqBody.containment_level;
+    }
+
+    //    
+    //Check for square_footage
+    //
+    if (typeof(reqBody.square_footage) ==='undefined'){
+        square_footage_var=lab[0].square_footage 
+    }
+    //if array includes square_footage, load req param into variable
+    else if (typeof(reqBody.square_footage) !=='undefined'){
+        square_footage_var =reqBody.square_footage;
+    }
+     //    
+    //Check for agent
+    //
+    if (typeof(reqBody.agent) ==='undefined'){
+        agent_var=lab[0].agent 
+    }
+    //if array includes agent, load req param into variable
+    else if (typeof(reqBody.agent) !=='undefined'){
+        agent_var =reqBody.agent;
+    }
+        //load new variables into the database
+        //var name_var, containment_level_var, square_footage_var, owner_var ;
+
+        console.log ("Which keys: vars "+name_var+containment_level_var+ square_footage_var+owner_var);
+        lab[0].name = name_var;
+        lab[0].containment_level=containment_level_var;
+        lab[0].square_footage=square_footage_var;
+        lab[0].owner=owner_var;
+        console.log ("Which keys: lab[0] "+lab[0].name+lab[0].containment_level+ lab[0].square_footage+lab[0].owner);
+    
+
+    console.log("lab[0] "+ JSON.stringify(lab[0]));
+    return datastore.save({ "key": l_key, "data": lab[0] });
+
+}
 
 
 
@@ -390,11 +459,10 @@ function count_keys_agent(req_body){
 //-------------------------------------
 
 async function put_agent(res, id, name, risk_group, type, owner, lab){
-    const key = datastore.key([LAB, parseInt(id, 10)]);
+    const key = datastore.key([AGENT, parseInt(id, 10)]);
     console.log ("key ", JSON.stringify(key))
-    console.log ("agent ", JSON.stringify(lab))
     const agent_data = {"name": name, "risk_group": risk_group, "type": type, "lab": lab, "owner": owner};
-    console.log ("lab_data ", JSON.stringify(agent_data));
+    console.log ("agwnr_data ", JSON.stringify(agent_data));
        return datastore.save({"key":key, "data":agent_data});
 }
 
@@ -537,13 +605,18 @@ async function get_agents(req,owner){
 
 }
 
-async function which_keys_to_update(req){
+
+
+//
+// AGENT: which keys to update
+//
+async function which_agent_keys_to_update(req){
    
     var key_array = Object.keys(req.body);
     var reqBody = req.body;
-    const l_key = datastore.key([LAB, parseInt(req.params.lab_id,10)]);
-    const lab  = await datastore.get(l_key);
-    var name_var, containment_level_var, square_footage_var, owner_var ;
+    const a_key = datastore.key([AGENT, parseInt(req.params.agent_id,10)]);
+    const agent  = await datastore.get(a_key);
+    var name_var, risk_group_var, type_var, lab_var ;
 
     //    
     //Check for Name
@@ -551,9 +624,9 @@ async function which_keys_to_update(req){
     //if there is not a name in request
     if (typeof(reqBody.name) === 'undefined'){
         //load the current value back into name var for later use
-        name_var=lab[0].name;
+        name_var=agent[0].name;
     //if there is a name in the request
-    }else if (typeof(lab[0].name) !== 'undefined'){
+    }else if (typeof(agent[0].name) !== 'undefined'){
     //load the new name into name var
         name_var=reqBody.name 
     }
@@ -561,41 +634,42 @@ async function which_keys_to_update(req){
     //    
     //Check for containment_level
     //
-    if (typeof(reqBody.containment_level) === 'undefined'){
-        containment_level_var = lab[0].containment_level;
+    if (typeof(reqBody.risk_group) === 'undefined'){
+        risk_group_var = agent[0].risk_group;
     //if array includes name, load req param into variable
-    }else if (typeof(reqBody.containment_level) !== 'undefined'){
-        containment_level_var = reqBody.containment_level;
+    }else if (typeof(reqBody.risk_group) !== 'undefined'){
+        risk_group_var = reqBody.risk_group;
     }
 
     //    
-    //Check for square_footage
+    //Check for type
     //
-    if (typeof(reqBody.square_footage) ==='undefined'){
-        type_var=lab[0].square_footage 
+    if (typeof(reqBody.type) ==='undefined'){
+        type_var=agent[0].type; 
     }
-    //if array includes square_footage, load req param into variable
-    else if (typeof(reqBody.square_footage) !=='undefined'){
-        square_footage_var =reqBody.square_footage;
+    //if array includes type, load req param into variable
+    else if (typeof(reqBody.type) !=='undefined'){
+        type_var =reqBody.type;
     }
      //    
-    //Check for agent
+    //Check for lab
     //
-    if (typeof(reqBody.agent) ==='undefined'){
-        agent_var=lab[0].agent 
+    if (typeof(reqBody.lab) ==='undefined'){
+        lab_var=agent[0].lab; 
     }
     //if array includes agent, load req param into variable
     else if (typeof(reqBody.agent) !=='undefined'){
-        agent_var =reqBody.agent;
+        lab_var =reqBody.lab;
     }
         //load new variables into the database
-        //var name_var, containment_level_var, square_footage_var, owner_var ;
-        lab[0].name = name_var;
-        lab[0].containment_level=containment_level_var;
-        lab[0].square_footage=square_footage_var;
-        lab[0].owner=owner_var;
+        console.log ("inside vars" +name_var+risk_group_var+type_var+lab_var);
+        agent[0].name = name_var;
+        agent[0].risk_group=risk_group_var;
+        agent[0].type=type_var;
+        agent[0].lab=lab_var;
 
-    return datastore.save({ "key": b_key, "data": lab[0] });
+    console.log("agent[0] "+ JSON.stringify(agent[0]));
+    return datastore.save({ "key": a_key, "data": agent[0] });
 
 }
 
@@ -721,6 +795,7 @@ module.exports.pass_a=pass_agent;
 module.exports.comp_k_a=compare_keys_agent;
 module.exports.put_a=put_agent;
 module.exports.count_k_a=count_keys_agent;
+module.exports.which_a_k=which_agent_keys_to_update;
 
 module.exports.get_sci=get_scientists;
 module.exports.ps=post_scientist;

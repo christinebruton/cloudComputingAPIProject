@@ -184,8 +184,9 @@ router.get('/', checkJwt, function(req, res){
            res.status(400).send(u.msg_400());
        }else if (valid_input == true){
            //the request is valid, update parameters
-           u.which_k(req).then(
+           u.which_a_k(req).then(
                datastore.get(agent_key,(err, agent)=>{
+                 //change to req data 
                    if (!err){
                     queryData = {
                       id: agent_key.id,
