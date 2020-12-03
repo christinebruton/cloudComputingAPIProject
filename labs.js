@@ -81,6 +81,192 @@ if (!u.l_SF_t_v(req)){
 });
 
 //
+// PUT: Update relationship
+//
+ router.put('/:lab_id/agents/:agent_id', function(req, res){
+   console.log ("IN PUT relationship")
+
+//   const lab_key = datastore.key([LAB, parseInt(req.params.lab_id,10)]);
+//   console.log ("lab_key "+ JSON.stringify(lab_key))
+//   var valid_input = true; 
+//   switch (u.comp_k(req.body)){
+//     case 1:
+//       console.log("PUT comp_k returns: case 1");
+//         valid_input = false;
+//         break;
+//     case 2:
+//       console.log("PUT comp_k returns: case 2");
+//         valid_input =false;
+//         break;
+//     case 3:
+//       console.log("PUT comp_k returns: case 3");
+//         valid_input=true;
+//         break;
+//     default:
+//       console.log("PUT comp_k returns: default");
+//         valid_input=true;
+//   }
+//   if (valid_input == false)
+//   {
+//       console.log("PUT:Valid_input == false")
+//       res.status(400).send(u.msg_400());
+//   }else if (valid_input == true){
+//     console.log("PUT: Valid_input == true")
+//     console.log("PUT: res "+ res+ " req.params.lab_id " + req.params.lab_id + " req.body.name " + req.body.name+ " req.body.containment_level "+ req.body.containment_level+ " req.body.square_footage " + req.body.square_footage+" req.body.lab"+ JSON.stringify(req.body.agent))
+//    u.put_l(res, req.params.lab_id, req.body.name, req.body.containment_level, req.body.square_footage, req.body.lab) 
+//    .then(
+//     datastore.get(lab_key,(err, lab)=>{ 
+//         if (!err){
+//         console.log ("Object.keys "+ Object.keys(lab))
+//         console.log (lab['name'])
+//         queryData = {
+//                         id: lab_key.id,
+//                         name: lab.name,
+//                         containment_level: lab.containment_level,
+//                         square_footage: lab.square_footage,
+//                         agent: agent.agent,
+//                         owner:lab.owner,
+//                         self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + lab_key.id 
+//                     };
+//                     console.log("lab.name "+ lab['name'])
+//                     //res.status(303)
+//                     res.status(200).json(queryData);
+//         }
+//           else if (err){
+//         console.log ("PUT: There was an error in dayast")
+//         res.status(502).send(u.msg_502())
+//         } 
+//     })
+// )
+
+
+//   }
+
+
+ });
+
+//
+// PUT: Update lab
+//
+router.put('/:lab_id', checkJwt, function(req, res){
+  console.log ("IN PUT")
+
+  const lab_key = datastore.key([LAB, parseInt(req.params.lab_id,10)]);
+  console.log ("lab_key "+ JSON.stringify(lab_key))
+  var valid_input = true; 
+  switch (u.comp_k(req.body)){
+    case 1:
+      console.log("PUT comp_k returns: case 1");
+        valid_input = false;
+        break;
+    case 2:
+      console.log("PUT comp_k returns: case 2");
+        valid_input =false;
+        break;
+    case 3:
+      console.log("PUT comp_k returns: case 3");
+        valid_input=true;
+        break;
+    default:
+      console.log("PUT comp_k returns: default");
+        valid_input=true;
+  }
+  if (valid_input == false)
+  {
+      console.log("PUT:Valid_input == false")
+      res.status(400).send(u.msg_400());
+  }else if (valid_input == true){
+    console.log("PUT: Valid_input == true lab "+ JSON.stringify(req.body))
+    console.log("PUT: res "+ res+ " req.params.lab_id " + req.params.lab_id + " req.body.name " + req.body.name+ " req.body.containment_level "+ req.body.containment_level+ " req.body.square_footage " + req.body.square_footage+" req.body.lab"+ JSON.stringify(req.body.lab))
+   u.put_l(res, req.params.lab_id, req.body.name, req.body.containment_level, req.body.square_footage, req.user.sub, req.body.agent) 
+   .then(
+    datastore.get(lab_key,(err, lab)=>{ 
+        if (!err){
+        console.log ("Object.keys "+ Object.keys(lab))
+        console.log ("LAB agent "+ JSON.stringify(lab.agent))
+        console.log (lab['name'])
+        queryData = {
+                        id: lab_key.id,
+                        name: lab.name,
+                        containment_level: lab.containment_level,
+                        square_footage: lab.square_footage,
+                        agent: lab.agent,
+                        owner:lab.owner,
+                        self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + lab_key.id 
+                    };
+                    console.log("lab.name "+ lab['name'])
+                    //res.status(303)
+                    res.status(200).json(queryData);
+        }
+          else if (err){
+          console.log ("PUT: There was an error in dayast")
+          res.status(502).send(u.msg_502())
+          } 
+      })
+)
+
+
+}
+
+
+});
+
+
+//
+// PATCH: Update lab
+//
+router.patch('/:lab_id', checkJwt, function(req, res){
+  console.log ("IN PATCH")
+  const lab_key = datastore.key([LAB, parseInt(req.params.lab_id,10)]);
+  
+   //u.count_k (req.body);
+   var valid_input; 
+       switch (u.count_k(req.body)){
+        case 1:
+            valid_input = false;
+            break;
+        case 2:
+            valid_input =false;
+            break;
+        case 3:
+            valid_input=true;
+            break;
+        default:
+            valid_input=true;
+       } if (valid_input == false){
+           res.status(400).send(u.msg_400());
+       }else if (valid_input == true){
+           //the request is valid, update parameters
+           u.which_k(req).then(
+               datastore.get(lab_key,(err, lab)=>{
+                   if (!err){
+                    queryData = {
+                      id: lab_key.id,
+                      name: lab.name,
+                      containment_level: lab.containment_level,
+                      square_footage: lab.square_footage,
+                      agent: lab.agent,
+                      owner:lab.owner,
+                      self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + lab_key.id 
+                  };
+                       console.log("lab.name "+ lab.name)
+                       res.status(200).json(queryData);
+                   }
+               //console.log(JSON.stringify(ret_boat))
+               else if (err){
+                console.log ("PUT: There was an error in datastore")
+                res.status(502).send(u.msg_502())
+               } 
+           })
+           )
+       }
+   });
+
+     
+         
+
+
+//
 // If the supplied JWT is valid, return 200 status code and all labs whose owner matches the "sub" property in the supplied JWT
 // If no JWT is provided or an invalid JWT is provided, return empty brackets
 //
@@ -148,64 +334,6 @@ router.delete('/:lab_id', checkJwt, function(req, res, err){
  
 });
 
-// TODO: go through and implement
-// PUT Lab
-//
-router.put('/:lab_id', function(req, res){
-  const lab_key = datastore.key([LAB, parseInt(req.params.lab_id,10)]);
- // u.check(boat_key).then( boat =>{
-      var content_type = req.headers['content-type']
-      res.set("Content-Type", "application/json")
-      if (!content_type || content_type.indexOf('application/json') !=0)
-      {
-         console.log("Error in POST: Client send content type of "+ content_type + "but application/json required")
-          res.status(415).send(u.msg_415());
-      }
-      var valid_input = true; 
-      switch (u.comp_k(req.body)){
-       case 1:
-           valid_input = false;
-           break;
-       case 2:
-           valid_input =false;
-           break;
-       case 3:
-           valid_input=true;
-           break;
-       default:
-           valid_input=true;
-  }
-  if (valid_input == false)
-  {
-      console.log("PUT:Valid_input == false")
-      res.status(400).send(u.msg_400());
-  }
-  else if (valid_input == true){
-      console.log("PUT: Valid_input == true")
-      u.put_b(res, req.params.lab_id, req.body.name, req.body.containment_level, req.body.square_footage)
-      .then(
-          datastore.get(lab_key,(err, lab)=>{ 
-              if (!err){
-              console.log (Object.keys(lab))
-              console.log (lab['name'])
-              queryData = {
-                              id: boat_key.id,
-                              name: boat.name,
-                              type: boat.type,
-                              length: boat.length,
-                              self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + boat_key.id 
-                          };
-                          console.log("boat.name "+ boat['name'])
-                          res.status(303).json(queryData);
-              }
-                else if (err){
-              console.log ("PUT: There was an error in dayast")
-              res.status(404).send(u.msg_404())
-              } 
-          })
-      )
-  }
-});
 
 
   /* ------------- End Controller Functions ------------- */

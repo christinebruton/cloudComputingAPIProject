@@ -53,10 +53,10 @@ router.post('/', u.goi, checkJwt, function(req, res){
 else{
       //post scientist
 
-      console.log ("is there a double "+ u.c_f_d);
-      u.ps(req.user.name,req.user.sub)
+      //console.log ("is there a double "+ u.c_f_d);
+      //u.ps(req.user.name,req.user.sub)
     //};
-      u.pa(req.body.name, req.body.lab, req.body.risk_group, req.body.type, req.user.sub)
+      u.pa(req.body.name, req.body.lab, req.body.risk_group, req.body.type, req.user.sub, req.user)
 
         .then( key=>
              res.status(201).send(u.ret_a(key, req))).catch((error) => {
