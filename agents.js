@@ -88,6 +88,134 @@ router.get('/', checkJwt, function(req, res){
   }
   });
 
+
+  //
+  // PUT: Update agent
+  //
+  router.put('/:agent_id', checkJwt, function(req, res){
+  console.log ("IN PUT agent")
+
+  const agent_key = datastore.key([AGENT, parseInt(req.params.agent_id,10)]);
+  console.log ("agent_key "+ JSON.stringify(agent_key))
+  var valid_input = true; 
+  switch (u.comp_k_a(req.body)){
+    case 1:
+      console.log("PUT comp_k_a returns: case 1");
+        valid_input = false;
+        break;
+    case 2:
+      console.log("PUT comp_k_a returns: case 2");
+        valid_input =false;
+        break;
+    case 3:
+      console.log("PUT comp_k_a returns: case 3");
+        valid_input=true;
+        break;
+    default:
+      console.log("PUT comp_k_a returns: default");
+        valid_input=true;
+  }
+  if (valid_input == false)
+  {
+      console.log("PUT:Valid_input == false")
+      res.status(400).send(u.msg_400());
+  }else if (valid_input == true){
+    console.log("PUT: Valid_input == true lab "+ JSON.stringify(req.body))
+    console.log("PUT: res "+ res+ " req.params.agent_id " + req.params.agent_id + " req.body.name " + req.body.name+ " req.body.risk_group "+ req.body.risk_group+ " req.body.type " + req.body.type +" req.body.lab"+ JSON.stringify(req.body.lab))
+   u.put_a(res, req.params.agent_id, req.body.name, req.body.risk_group, req.body.type, req.user.sub, req.body.lab) 
+   .then(
+    datastore.get(agent_key,(err, agent)=>{ 
+        if (!err){
+        console.log ("Object.keys "+ Object.keys(agent))
+        console.log ("AGENT agent "+ JSON.stringify(agent.lab))
+        console.log (agent['name'])
+        queryData = {
+                        id: agent_key.id,
+                        name: agent.name,
+                        risk_group: agent.risk_group,
+                        type: agent.type,
+                        lab: agent.lab,
+                        owner: agent.owner,
+                        self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + agent_key.id 
+                    };
+                    console.log("agent.name "+ agent['name'])
+                    //res.status(303)
+                    res.status(200).json(queryData);
+        }
+          else if (err){
+          console.log ("PUT: There was an error in dayast")
+          res.status(502).send(u.msg_502())
+            } 
+          })
+        )
+
+
+      }
+
+
+});
+
+
+  //
+  // PATCH: Update agent
+  //
+  router.patch('/:agent_id', checkJwt, function(req, res){
+  console.log ("IN PATCH")
+  const agent_key = datastore.key([AGENT, parseInt(req.params.agent_id,10)]);
+  
+   var valid_input; 
+       switch (u.count_k_a(req.body)){
+        case 1:
+            console.log("case 1")
+            valid_input = false;
+            break;
+        case 2:
+          console.log("case 2")
+            valid_input =false;
+            break;
+        case 3:
+          console.log("case 3")
+            valid_input=true;
+            break;
+        default:
+          console.log("default")
+            valid_input=true;
+       } if (valid_input == false){
+           res.status(400).send(u.msg_400());
+       }else if (valid_input == true){
+           //the request is valid, update parameters
+           u.which_k(req).then(
+               datastore.get(agent_key,(err, agent)=>{
+                   if (!err){
+                    queryData = {
+                      id: agent_key.id,
+                      name: agent.name,
+                      risk_group: agent.risk_group,
+                      type: agent.type,
+                      lab: agent.lab,
+                      owner: agent.owner,
+                      self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + agent_key.id 
+                  };
+                  console.log("agent.name "+ agent['name'])
+                       res.status(200).json(queryData);
+                   }
+               //console.log(JSON.stringify(ret_boat))
+               else if (err){
+                console.log ("PUT: There was an error in datastore")
+                res.status(502).send(u.msg_502())
+               } 
+           })
+           )
+       }
+   });
+
+     
+     
+
+
+
+
+
 //
 // get agent by ID
 //

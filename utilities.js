@@ -339,7 +339,7 @@ function risk_group_validation(req){
 function count_keys(req_body){
     var key_array = Object.keys(req_body);
     //console.log("requested key array " + key_array );
-    requested_key_num = key_array.lngth;
+    requested_key_num = key_array.length;
     required_key_num = 3;
     
     if (key_array.includes("id")){
@@ -356,6 +356,72 @@ function count_keys(req_body){
 //          AGENT HELPER FUNCTIONS
 //**********************************************************************************/
 
+
+//
+// INPUT VALIDATION
+// FOR AGENT checks to make sure correct number of parameters have been included
+//
+
+function count_keys_agent(req_body){
+    var key_array = Object.keys(req_body);
+    //console.log("requested key array " + key_array );
+    requested_key_num = key_array.length;
+    required_key_num = 3;
+    
+    if (key_array.includes("id")){
+        return 1; 
+    }else if (requested_key_num > required_key_num) {
+        return 2;
+    }else if (requested_key_num <= required_key_num){   
+        return 3;
+    }
+}
+
+
+
+
+
+
+
+//-------------------------------------
+// put_agent: Helper functions to save all parameters
+// in the datastore
+// Used with PUT
+//-------------------------------------
+
+async function put_agent(res, id, name, risk_group, type, owner, lab){
+    const key = datastore.key([LAB, parseInt(id, 10)]);
+    console.log ("key ", JSON.stringify(key))
+    console.log ("agent ", JSON.stringify(lab))
+    const agent_data = {"name": name, "risk_group": risk_group, "type": type, "lab": lab, "owner": owner};
+    console.log ("lab_data ", JSON.stringify(agent_data));
+       return datastore.save({"key":key, "data":agent_data});
+}
+
+
+//-------------------------------------
+// compare_keys: checks to make sure there are no 
+// extra or incorrect parameters in the request
+// Used with PUT
+//-------------------------------------
+function compare_keys_agent(req_body){
+    var key_array = JSON.stringify(Object.keys(req_body));
+    key_to_compare = {"name":"name", "lab":"lab","risk_group":"risk_group" , "type":"type" };
+     
+    var compare_key = JSON.stringify(Object.keys((key_to_compare)));
+    console.log ("compare_keys_agent: key to compare against "+ compare_key + "from request "+ key_array )
+ 
+    if (key_array.includes("id")){
+        console.log ("returning 1")
+        return 1; 
+    }else if (key_array !== compare_key) {
+        console.log ("returning 2")
+        return 2;
+    }else if (key_array === compare_key){   
+        console.log ("returning 3")
+        return 3;
+    }
+}
 
 
 // formats and returns a lab
@@ -495,7 +561,7 @@ async function which_keys_to_update(req){
     //    
     //Check for containment_level
     //
-    if (typeof(reqBody.length) === 'undefined'){
+    if (typeof(reqBody.containment_level) === 'undefined'){
         containment_level_var = lab[0].containment_level;
     //if array includes name, load req param into variable
     }else if (typeof(reqBody.containment_level) !== 'undefined'){
@@ -644,6 +710,7 @@ module.exports.pl=post_lab;
 module.exports.ret_l=return_posted_lab_data;
 module.exports.check=check_if_entity_exists;
 
+//agent helpers
 module.exports.gas=get_agents;
 module.exports.delete_a=delete_agent;
 module.exports.a_p_ok = agent_params_ok;
@@ -651,6 +718,9 @@ module.exports.r_g_v=risk_group_validation;
 module.exports.ret_a=return_posted_agent_data;
 module.exports.pa=post_agent;
 module.exports.pass_a=pass_agent;
+module.exports.comp_k_a=compare_keys_agent;
+module.exports.put_a=put_agent;
+module.exports.count_k_a=count_keys_agent;
 
 module.exports.get_sci=get_scientists;
 module.exports.ps=post_scientist;
@@ -658,7 +728,7 @@ module.exports.ps=post_scientist;
 
 //LAB PUT HELPERS
 module.exports.p_l_a=put_lab_agent;
-module.exports.count_k=count_keys
+module.exports.count_k=count_keys;
 module.exports.put_l=put_lab;
 
 //LAB PATCH HELPERS
