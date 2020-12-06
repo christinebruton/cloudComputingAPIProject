@@ -201,7 +201,8 @@ router.patch('/:lab_id', checkJwt, function(req, res){
 
    //
 // PUT: Update lab-agent relationship
-//     
+//    
+//TODO: make sure you can't change another owner's lab 
 router.put('/:lab_id/agents/:agent_id', checkJwt, function(req, res, err){
   const  a_key= datastore.key([AGENT, parseInt(req.params.agent_id,10)]);
   const l_key = datastore.key([LAB, parseInt(req.params.lab_id,10)]);
@@ -228,9 +229,57 @@ router.put('/:lab_id/agents/:agent_id', checkJwt, function(req, res, err){
   
           }).catch((err)=>{
               console.log('In router.put agent caught ' + err); 
-                  res.status(404).send({"Error": "The specified boat or load does not exist"});
+                  res.status(404).send({"Error": "Cannot add relationship, not found"});
           }); 
       });
+
+
+   //
+// DELETE: REMOVE lab-agent relationship
+// //TODO: make sure you can't change another owner's lab  
+
+router.delete('/:lab_id/agents/:agent_id', checkJwt, function(req, res, err){
+  const  a_key= datastore.key([AGENT, parseInt(req.params.agent_id,10)]);
+  const l_key = datastore.key([LAB, parseInt(req.params.lab_id,10)]);
+
+  console.log ("a_key "+ JSON.stringify(a_key) + "l_key " + JSON.stringify(l_key) );
+  u.check(l_key).then(
+    lab=>{
+
+   //TODO: ---------> call helper function to delete relationship
+        //u.p_sa_l(req.params.lab_id, req.params.agent_id).then(key=>{console.log ('In router.put after put_stored agent into lab. lab[0].stored_agents '+ JSON.stringify(lab[0].stored_agents))}).catch()
+      }).catch((err)=>{
+          console.log('In router.put lab caught ' + err); 
+              res.status(404).send({"Error": "The specified entity does not exist"});
+      }); 
+
+      u.check(a_key).then(
+        agent=>{
+          console.log ("router.delete('/:lab_id/agents/:agent_id': agent[0]" + JSON.stringify(agent[0]) );
+         if (agent[0].home_lab.id == null){
+          
+          //NO ACTION
+          
+          //u.put_hl_a(req.params.lab_id, req.params.agent_id)
+          //  .then(
+          //      res.status(204).send()); 
+         }else {
+            
+            u.delete_hl_a(req.params.agent_id).then(
+                   res.status(204).send()); 
+
+            //call function do delete agent 
+
+
+            //res.status(403).send(u.msg_403_a_a())
+         }
+
+        }).catch((err)=>{
+            console.log('In router.delete relationship caught ' + err); 
+                res.status(404).send({"Error": "The specified entity or entities do not exist"});
+        }); 
+
+});
 
 
 

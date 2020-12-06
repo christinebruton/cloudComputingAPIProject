@@ -138,6 +138,16 @@ async function put_home_lab_into_agent(l_id, a_id){
     return datastore.save({ "key": a_key, "data": agent[0] });
 }
 
+//delete home lab in agent
+async function delete_home_lab_from_agent(a_id){
+    const a_key = datastore.key([AGENT, parseInt(a_id,10)]);
+    const agent = await datastore.get(a_key);
+    agent[0].home_lab.id = "null";
+    console.log("put_agent_lab after agent[0].home_lab.id " + JSON.stringify(agent));
+    return datastore.save({ "key": a_key, "data": agent[0] });
+}
+
+
 
 //-------------------------------------
 // put_lab: Helper functions to save all parameters
@@ -799,6 +809,7 @@ module.exports.ps=post_scientist;
 module.exports.p_sa_l=put_stored_agent_into_lab;
 //put an agent into a lab
 module.exports.put_hl_a=put_home_lab_into_agent;
+module.exports.delete_hl_a=delete_home_lab_from_agent;
 module.exports.count_k=count_keys;
 module.exports.put_l=put_lab;
 
