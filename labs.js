@@ -241,14 +241,18 @@ router.put('/:lab_id/agents/:agent_id', checkJwt, function(req, res, err){
 router.delete('/:lab_id/agents/:agent_id', checkJwt, function(req, res, err){
   const  a_key= datastore.key([AGENT, parseInt(req.params.agent_id,10)]);
   const l_key = datastore.key([LAB, parseInt(req.params.lab_id,10)]);
+  const agent_id_to_delete = req.params.agent_id;
+  const lab_id_to_change = req.params.lab_id;
+  console.log ("router.delete('/:lab_id/agents/:agent_id: agent to id to delete'" + agent_id_to_delete )
+
 
   console.log ("a_key "+ JSON.stringify(a_key) + "l_key " + JSON.stringify(l_key) );
   u.check(l_key).then(
     lab=>{
 
-   //TODO: ---------> call helper function to delete relationship
-        //u.p_sa_l(req.params.lab_id, req.params.agent_id).then(key=>{console.log ('In router.put after put_stored agent into lab. lab[0].stored_agents '+ JSON.stringify(lab[0].stored_agents))}).catch()
-      }).catch((err)=>{
+      u.delete_s_a_f_e(lab_id_to_change, agent_id_to_delete);  
+    
+    }).catch((err)=>{
           console.log('In router.put lab caught ' + err); 
               res.status(404).send({"Error": "The specified entity does not exist"});
       }); 

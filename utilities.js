@@ -146,6 +146,42 @@ async function delete_home_lab_from_agent(a_id){
     console.log("put_agent_lab after agent[0].home_lab.id " + JSON.stringify(agent));
     return datastore.save({ "key": a_key, "data": agent[0] });
 }
+//delete a stored agent from the stored agent array
+function delete_a_stored_agent_from_array(stored_agents, agent_to_delete){
+    console.log("delete_a_stored_agent_from_array: stored agents before delete "+ stored_agents);
+    const index = stored_agents.indexOf(agent_to_delete);
+    console.log("delete_a_stored_agent_from_array: index of agent to delete "+ index);
+	if (index > -1){
+	stored_agents.splice(index, 1);
+	}
+console.log("delete_a_stored_agent_from_array: stored agents after delete "+ stored_agents);
+    return stored_agents;
+}
+//delete a stored agent from an entity
+async function delete_a_stored_agent_from_entity(l_id, agent_to_delete){
+    const l_key = datastore.key([LAB, parseInt(l_id,10)]);
+    const lab = await datastore.get(l_key);
+    console.log ("delete_a_stored_agent_from_entity:lab[0].stored_agents before delete "+  lab[0].stored_agents );
+    if (typeof (lab[0].stored_agents) !== 'undefined' && lab[0].stored_agents !== null  ) {
+        var newSA_array = delete_a_stored_agent_from_array(lab[0].stored_agents, agent_to_delete) 
+        console.log ("delete_a_stored_agent_from_entity:newSA_array "+  lab[0].stored_agents );
+  
+        lab[0].stored_agents = newSA_array;
+        console.log ("delete_a_stored_agent_from_entity:lab[0].stored_agents after delay "+  lab[0].stored_agents );
+  
+    }
+    else if (typeof (lab[0].stored_agents) === 'undefined' ) {
+        lab[0].stored_agents = [];
+    }
+    else if (lab[0].stored_agents[0] === null ) {
+        lab[0].stored_agents = [];
+    }
+
+    return datastore.save({ "key": l_key, "data": lab[0] });
+
+}
+
+
 
 
 
@@ -777,6 +813,9 @@ module.exports.oc=owner_confirm;
 module.exports.gls=get_labs;
 module.exports.gl=get_lab;
 module.exports.pass_l=pass_a_lab;
+
+module.exports.delete_s_a =delete_a_stored_agent_from_array;
+module.exports.delete_s_a_f_e=delete_a_stored_agent_from_entity;
 module.exports.delete_l = delete_lab;
 module.exports.c_level_valid=containment_level_validation;
 module.exports.l_SF_t_v=lab_SF_type_validation;
