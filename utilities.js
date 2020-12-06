@@ -102,10 +102,42 @@ function compare_keys(req_body){
     }
 }
 
+//use this to make sure owners are auth for relationship put
+async function put_rel_owner_confirm(a_key_obj, l_key_obj, u_id) {
+    
+    
+    console.log("In owner_confirm entity id " + entity[0].owner + " jwt_id "+jwt_id);
+    const entity = await datastore.get(keyObj);
+    //TODO: look up both entities and compare
+    if (entity[0].owner !== jwt_id){
+        return false;
+    }else{
+        return true;
+    }
+};
+
 //**********************************************************************************/
 //          LAB HELPER FUNCTIONS
 //**********************************************************************************/
 
+//use this to make sure owners are auth for lab  put
+async function put_lab_owner_confirm(l_key_obj, u_id) {
+    var owner_auth;
+    console.log("In owner_confirm entity key  " + JSON.stringify(l_key_obj) + " u_id "+u_id);
+    const entity = await datastore.get(l_key_obj);
+    console.log ("put_lab_owner_confirm: entity[0].owner "+entity[0].owner);
+    console.log ("put_lab_owner_confirm: u_id "+u_id);
+    //TODO: look up both entities and compare
+    if (entity[0].owner !== u_id){
+        console.log("put_lab_owner_confirm: FALSE" )
+        owner_auth =false;
+    }else{
+        console.log("put_lab_owner_confirm: TRUE" )
+        owner_auth =  true;
+    }
+    console.log ("put_lab_owner_confirm: owner_auth "+ owner_auth);
+    return owner_auth;
+};
 //
 // LAB PUT HELPER FUNCTION
 // Used to put agent into LAB
@@ -194,9 +226,23 @@ async function delete_a_stored_agent_from_entity(l_id, agent_to_delete){
 async function put_lab(id, name, containment_level, square_footage, owner){
     const key = datastore.key([LAB, parseInt(id, 10)]);
     console.log ("put_lab:key ", JSON.stringify(key));
+
+    const owner_lab=await datastore.get(key)
+    console.log("Put_lab owner_lab.owner:"+JSON.stringify(owner_lab[0].owner)+"owner passed:"+ owner );
+    
+    
+   if (owner_lab[0].owner == owner){
+    console.log("Put_lab owner_lab.owner:"+JSON.stringify(owner_lab[0].owner)+"owner passed:"+ owner );
+  
     const lab_data = {"name": name, "containment_level": containment_level, "square_footage": square_footage, "owner": owner};
-    console.log ("lab_data ", JSON.stringify(lab_data));
-       return datastore.save({"key":key, "data":lab_data});
+    datastore.save({"key":key, "data":lab_data});
+   }else {
+    console.log("------->CANNOT PUT:Put_lab owner_lab.owner:"+JSON.stringify(owner_lab[0].owner)+"owner passed:"+ owner );
+ 
+      //do nothing 
+   }
+
+       return;
 }
 
 
@@ -768,6 +814,9 @@ errorMsg = {
     msg_403: function(){
         return {"Error":"Unauthorized"};
     },
+    msg_403_u_lab: function(){
+        return {"Error":"Name of lab must be unique"};
+    },
     msg_403_agent_added: function(){
         return {"Error":"Agent already has a home_lab"};
     },
@@ -796,7 +845,8 @@ errorMsg = {
 module.exports.msg_400=errorMsg.msg_400;
 module.exports.msg_400_w_n_p=errorMsg.msg_400_Wrong_num_of_P;
 module.exports.msg_403=errorMsg.msg_403;
-module.exports.msg_403_a_a=errorMsg.msg_403_agent_added
+module.exports.msg_403_u_l=errorMsg.msg_403_u_lab;
+module.exports.msg_403_a_a=errorMsg.msg_403_agent_added;
 //module.exports.msg_404=errorMsg.msg_404;
 module.exports.msg_405=errorMsg.msg_405;
 module.exports.msg_406=errorMsg.msg_406;
@@ -809,6 +859,8 @@ module.exports.msg_502=errorMsg.msg_502;
 module.exports.comp_k=compare_keys;
 module.exports.u_name=unique_query;
 module.exports.oc=owner_confirm;
+module.exports.ploc=put_lab_owner_confirm;
+module.exports.proc=put_rel_owner_confirm;
 
 module.exports.gls=get_labs;
 module.exports.gl=get_lab;

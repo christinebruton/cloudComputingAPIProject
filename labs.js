@@ -64,7 +64,7 @@ if (!u.l_SF_t_v(req)){
 }else{
   u.u_name(req).then(bool => {
     if (bool == false){
-        res.status(403).send(u.msg_403()); 
+        res.status(403).send(u.msg_403_u_l()); 
     }else if(bool == true) {
       u.pl(req.body.name, req.body.containment_level, req.body.square_footage, req.user.sub, req.user, req.body.stored_agents )  
    
@@ -115,7 +115,14 @@ router.put('/:lab_id', checkJwt, function(req, res){
   }else if (valid_input == true){
     console.log("PUT LAB: Valid_input == true lab "+ JSON.stringify(req.body));
     console.log("PUT LAB:: res "+ res+ " req.params.lab_id " + req.params.lab_id + " req.body.name " + req.body.name+ " req.body.containment_level "+ req.body.containment_level+ " req.body.square_footage " + req.body.square_footage+" req.body.lab"+ JSON.stringify(req.body.lab));
-   u.put_l(req.params.lab_id, req.body.name, req.body.containment_level, req.body.square_footage, req.user.sub) 
+    
+    //returns true if owner is auth and false if not
+    //var is_owner_auth = u.ploc(lab_key, req.user.sub);
+    //console.log ("PUT is_owner_auth "+ is_owner_auth);
+  
+   
+   
+    u.put_l(req.params.lab_id, req.body.name, req.body.containment_level, req.body.square_footage, req.user.sub) 
    .then(
     datastore.get(lab_key,(err, lab)=>{ 
         if (!err){
@@ -134,14 +141,23 @@ router.put('/:lab_id', checkJwt, function(req, res){
         //            console.log("PUT LAB: queryData to send "+ JSON.stringify(queryData));
                     //res.status(303)
         //           res.status(200).json(queryData);
-                    res.sendStatus(204);
+
+        if (lab.owner === req.user.sub){
+          res.sendStatus(204);
+        }  else if (lab.owner !== req.user.sub){
+          res.status(403).send(u.msg_403());
+        }
+                    
         }
           else if (err){
           console.log ("PUT LAB: There was an error in sending data")
           res.status(502).send(u.msg_502())
           } 
       })
-)
+    ).catch((err)=>{
+      console.log('In router.put lab caught ' + err); 
+          res.status(403).send({"Error": "You are not the owner of this lab"});
+  }); 
 
 
 }
