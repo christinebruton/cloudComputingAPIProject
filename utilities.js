@@ -766,7 +766,7 @@ errorMsg = {
         return {"Error":"Missing or invalid JWT"};
     },
     msg_403: function(){
-        return {"Error":"This is a violation of the uniqueness constraint"};
+        return {"Error":"Unauthorized"};
     },
     msg_403_agent_added: function(){
         return {"Error":"Agent already has a home_lab"};

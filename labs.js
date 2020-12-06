@@ -121,19 +121,20 @@ router.put('/:lab_id', checkJwt, function(req, res){
         if (!err){
         console.log ("PUT LAB: Object.keys after datastore get "+ Object.keys(lab))
         console.log ("PUT LAB: stored_agents "+ JSON.stringify(lab.stored_agents))
-        console.log (lab['name'])
-        queryData = {
-                        id: lab_key.id,
-                        name: lab.name,
-                        containment_level: lab.containment_level,
-                        square_footage: lab.square_footage,
-                        stored_agents: lab.stored_agents,
-                        owner:lab.owner,
-                        self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + lab_key.id 
-                    };
-                    console.log("PUT LAB: queryData to send "+ JSON.stringify(queryData));
+        console.log (lab['name']);
+        // queryData = {
+        //                 id: lab_key.id,
+        //                 name: lab.name,
+        //                 containment_level: lab.containment_level,
+        //                 square_footage: lab.square_footage,
+        //                 stored_agents: lab.stored_agents,
+        //                 owner:lab.owner,
+        //                 self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + lab_key.id 
+        //             };
+        //            console.log("PUT LAB: queryData to send "+ JSON.stringify(queryData));
                     //res.status(303)
-                    res.status(200).json(queryData);
+        //           res.status(200).json(queryData);
+                    res.sendStatus(204);
         }
           else if (err){
           console.log ("PUT LAB: There was an error in sending data")
