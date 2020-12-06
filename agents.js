@@ -33,6 +33,7 @@ const checkJwt = jwt({
 
 
 //
+// POST AGENT
 // Create an agent
 // requires token
 //
@@ -56,7 +57,7 @@ else{
       //console.log ("is there a double "+ u.c_f_d);
       //u.ps(req.user.name,req.user.sub)
     //};
-      u.pa(req.body.name, req.body.lab, req.body.risk_group, req.body.type, req.user.sub, req.user)
+      u.pa(req.body.name, req.body.home_lab, req.body.risk_group, req.body.type, req.user.sub, req.user)
 
         .then( key=>
              res.status(201).send(u.ret_a(key, req))).catch((error) => {
@@ -67,7 +68,8 @@ else{
 });
 
 //
-// If the supplied JWT is valid, return 200 status code and all agents whose owner matches the "sub" property in the supplied JWT
+// GET ALL AGENTS
+//If the supplied JWT is valid, return 200 status code and all agents whose owner matches the "sub" property in the supplied JWT
 // If no JWT is provided or an invalid JWT is provided, return empty brackets
 //
 
@@ -134,7 +136,7 @@ router.get('/', checkJwt, function(req, res){
                         name: agent.name,
                         risk_group: agent.risk_group,
                         type: agent.type,
-                        lab: agent.lab,
+                        home_lab: agent.home_lab,
                         owner: agent.owner,
                         self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + agent_key.id 
                     };
@@ -193,7 +195,7 @@ router.get('/', checkJwt, function(req, res){
                       name: agent.name,
                       risk_group: agent.risk_group,
                       type: agent.type,
-                      lab: agent.lab,
+                      home_lab: agent.home_lab,
                       owner: agent.owner,
                       self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + agent_key.id 
                   };
@@ -218,6 +220,7 @@ router.get('/', checkJwt, function(req, res){
 
 
 //
+// GET AGENT
 // get agent by ID
 //
 router.get('/:agent_id', checkJwt, function(req, res, next){
@@ -227,9 +230,11 @@ router.get('/:agent_id', checkJwt, function(req, res, next){
   console.log ("in get: agent id key " + JSON.stringify(agent_key));
  
   u.check(agent_key).then( agent =>{
-   console.log(u.oc(agent, req.user.sub)),
-    console.log("get/:agent_id. JWT id " + req.user.sub + " agent owner from db "+ agent[0].owner)
-    console.log("in get: returned agent " + JSON.stringify(agent) ),
+    //confirm owner is correct
+   console.log(u.oc(agent, req.user.sub));
+    console.log("get/:agent_id. JWT id " + req.user.sub + " agent owner from db "+ agent[0].owner);
+    console.log("in get: returned agent " + JSON.stringify(agent) );
+    //return formatted agent
     res.status(200).json(u.pass_a(agent, req));
  });    
 });

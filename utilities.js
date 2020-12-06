@@ -19,16 +19,18 @@ router.use(bodyParser.json());
 //**********************************************************************************/
 
 
+
+
 // formats and returns a lab
 
-async function pass_a_lab(lab, req){
-   console.log ("pass_a_lab: lab"+ JSON.stringify(lab)) ;
+function pass_a_lab(lab, req){
+ 
     queryData = {
        id: req.params.id,
        name: lab[0]['name'],
        containment_level: lab[0].containment_level,
        square_footage: lab[0].square_footage,
-       agent:lab[0].agent, 
+       agent:lab[0].stored_agents, 
        owner:lab[0].owner,
        self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + req.params.id 
    };
@@ -83,24 +85,22 @@ async function check_if_entity_exists(keyObj){
 //-------------------------------------
 function compare_keys(req_body){
     var key_array = JSON.stringify(Object.keys(req_body));
-    key_to_compare = {"name":"name", "containment_level":"containment_level" , "square_footage":"square_footage", "agent":"agent"};
+    key_to_compare = {"name":"name", "containment_level":"containment_level" , "square_footage":"square_footage"};
      
     var compare_key = JSON.stringify(Object.keys((key_to_compare)));
     console.log ("compare_keys: key to compare against "+ compare_key + "from request "+ key_array )
  
     if (key_array.includes("id")){
-        console.log ("returning 1")
+        console.log ("compare_keys: returning 1 - cannot change ID")
         return 1; 
     }else if (key_array !== compare_key) {
-        console.log ("returning 2")
+        console.log ("compare_keys: returning 2 - invalid keys")
         return 2;
     }else if (key_array === compare_key){   
-        console.log ("returning 3")
+        console.log ("compare_keys:returning 3 - valid keys")
         return 3;
     }
 }
-
-
 
 //**********************************************************************************/
 //          LAB HELPER FUNCTIONS
@@ -110,27 +110,31 @@ function compare_keys(req_body){
 // LAB PUT HELPER FUNCTION
 // Used to put agent into LAB
 
-function put_lab_agent(l_id, a_id){
-    console.log ("Adding agent: " + a_id + "to lab: "+ l_id)
+async function put_stored_agent_into_lab(l_id, a_id){
+    console.log ("put_stored_agent_into_lab: Adding agent: " + a_id + "to lab: "+ l_id)
     const l_key = datastore.key([LAB, parseInt(l_id,10)]);
-    return datastore.get(l_key)
-    .then( (lab) => {
-        if (typeof (lab[0].agents) === 'undefined') {
-                    lab[0].agents = [];
-        }
-        lab[0].agents.push(a_id);
-        return datastore.save({"key":l_key, "data":lab[0]});
-    })
+    const lab = await datastore.get(l_key);
+    console.log ("lab[0].stored_agents "+  lab[0].stored_agents + "lab[0].stored_agents[0].id keys "+ JSON.stringify(lab[0].stored_agents[0]));
+    if (typeof (lab[0].stored_agents) === 'undefined' ) {
+        lab[0].stored_agents = [];
+    }
+    if (lab[0].stored_agents[0] === null ) {
+        lab[0].stored_agents = [];
+    }
+
+    lab[0].stored_agents.push(a_id);
+    console.log("put_agent_lab after lab[0].stored_agents.push(a_id) " + JSON.stringify(lab[0].stored_agents));
+    return datastore.save({ "key": l_key, "data": lab[0] });
 
 }
 
 //put lab into agent 
-async function put_agent_lab(b_id, l_id){
+async function put_home_lab_into_agent(l_id, a_id){
     const a_key = datastore.key([AGENT, parseInt(a_id,10)]);
     const l_key = datastore.key([LAB, parseInt(l_id,10)]);
-    const load = await datastore.get(a_key);
-    agent[0].lab.id = l_id;
-    console.log("put_agent_lab after agent[0].carrier.id = l_id " + JSON.stringify(agent));
+    const agent = await datastore.get(a_key);
+    agent[0].home_lab.id = l_id;
+    console.log("put_agent_lab after agent[0].home_lab.id " + JSON.stringify(agent));
     return datastore.save({ "key": a_key, "data": agent[0] });
 }
 
@@ -141,17 +145,13 @@ async function put_agent_lab(b_id, l_id){
 // Used with PUT
 //-------------------------------------
 
-async function put_lab(res, id, name, containment_level, square_footage, owner, agent){
+async function put_lab(id, name, containment_level, square_footage, owner){
     const key = datastore.key([LAB, parseInt(id, 10)]);
-    console.log ("key ", JSON.stringify(key))
-    console.log ("agent ", JSON.stringify(agent))
-    const lab_data = {"name": name, "containment_level": containment_level, "square_footage": square_footage, "owner": owner, "agent": agent};
+    console.log ("put_lab:key ", JSON.stringify(key));
+    const lab_data = {"name": name, "containment_level": containment_level, "square_footage": square_footage, "owner": owner};
     console.log ("lab_data ", JSON.stringify(lab_data));
        return datastore.save({"key":key, "data":lab_data});
 }
-
-
-
 
 
 //
@@ -160,7 +160,7 @@ async function put_lab(res, id, name, containment_level, square_footage, owner, 
 // also posts owner as a scientist if it isn't already listed in the db
 //
 
-async function post_lab(name, containment_level, square_footage, owner, user, agent){
+async function post_lab(name, containment_level, square_footage, owner, user, stored_agents){
 
     var noDupSci;
     console.log("user "+ JSON.stringify(user))
@@ -177,7 +177,7 @@ async function post_lab(name, containment_level, square_footage, owner, user, ag
     }
     
     var key = datastore.key(LAB);
-	const new_lab = {"name": name, "containment_level": containment_level, "square_footage": square_footage,  "owner": owner , "agent": agent};
+	const new_lab = {"name": name, "containment_level": containment_level, "square_footage": square_footage,  "owner": owner , "stored_agents": stored_agents};
     console.log ("post_lab: new lab "+ new_lab);
     await datastore.save({ "key": key, "data": new_lab });
     return key;
@@ -255,7 +255,7 @@ async function unique_query(req){
  return name_is_unique
 }
 
-//
+//MIGHT NOT BE WORKING
 // used with POST to return formatted lab info
 // FOR LAB, formats and returns info from the posted lab
 //
@@ -267,6 +267,7 @@ function return_posted_lab_data(key, req){
         name: req.body.name,
         containment_level: req.body.containment_level,
         square_footage: req.body.square_footage,
+        stored_agents:req.body.stored_agents,
         owner: req.user.sub,
         self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + key.id 
 };
@@ -312,9 +313,6 @@ function delete_lab(keyObj){
        return datastore.delete(keyObj);
 }
 
-
-
-
 //
 // INPUT VALIDATION
 // FOR LAB checks to make sure all parameters have been included
@@ -351,11 +349,9 @@ function count_keys(req_body){
     }
 }
 
-
 //**********************************************************************************/
 //          AGENT HELPER FUNCTIONS
 //**********************************************************************************/
-
 
 //
 // INPUT VALIDATION
@@ -381,13 +377,13 @@ function count_keys_agent(req_body){
 // LAB: which keys to update
 //
 async function which_keys_to_update(req){
-   
+    
     var key_array = Object.keys(req.body);
     var reqBody = req.body;
     const l_key = datastore.key([LAB, parseInt(req.params.lab_id,10)]);
     const lab  = await datastore.get(l_key);
     var name_var, containment_level_var, square_footage_var, owner_var ;
-
+    console.log ("which_keys_to_update: lab after datastore get "+ JSON.stringify(lab) )
     //    
     //Check for Name
     //
@@ -400,7 +396,6 @@ async function which_keys_to_update(req){
     //load the new name into name var
         name_var=reqBody.name 
     }
-
     //    
     //Check for containment_level
     //
@@ -410,7 +405,6 @@ async function which_keys_to_update(req){
     }else if (typeof(reqBody.containment_level) !== 'undefined'){
         containment_level_var = reqBody.containment_level;
     }
-
     //    
     //Check for square_footage
     //
@@ -421,36 +415,26 @@ async function which_keys_to_update(req){
     else if (typeof(reqBody.square_footage) !=='undefined'){
         square_footage_var =reqBody.square_footage;
     }
-     //    
-    //Check for agent
-    //
-    if (typeof(reqBody.agent) ==='undefined'){
-        agent_var=lab[0].agent 
-    }
-    //if array includes agent, load req param into variable
-    else if (typeof(reqBody.agent) !=='undefined'){
-        agent_var =reqBody.agent;
-    }
+    owner_var=lab[0].owner;
+    console.log ("LAB: which keys to update: owner_var " + owner_var)
+
+  
         //load new variables into the database
         //var name_var, containment_level_var, square_footage_var, owner_var ;
 
-        console.log ("Which keys: vars "+name_var+containment_level_var+ square_footage_var+owner_var);
         lab[0].name = name_var;
         lab[0].containment_level=containment_level_var;
         lab[0].square_footage=square_footage_var;
+        lab[0].stored_agents=lab[0].stored_agents
         lab[0].owner=owner_var;
-        console.log ("Which keys: lab[0] "+lab[0].name+lab[0].containment_level+ lab[0].square_footage+lab[0].owner);
-    
 
-    console.log("lab[0] "+ JSON.stringify(lab[0]));
+        console.log ("Which keys: vars after loading lab owner "+ JSON.stringify(lab[0].owner));
+     
+
+    console.log("Which keys: lab[0] "+ JSON.stringify(lab[0].owner));
     return datastore.save({ "key": l_key, "data": lab[0] });
 
 }
-
-
-
-
-
 
 //-------------------------------------
 // put_agent: Helper functions to save all parameters
@@ -458,10 +442,10 @@ async function which_keys_to_update(req){
 // Used with PUT
 //-------------------------------------
 
-async function put_agent(res, id, name, risk_group, type, owner, lab){
+async function put_agent(res, id, name, risk_group, type, owner, home_lab){
     const key = datastore.key([AGENT, parseInt(id, 10)]);
     console.log ("key ", JSON.stringify(key))
-    const agent_data = {"name": name, "risk_group": risk_group, "type": type, "lab": lab, "owner": owner};
+    const agent_data = {"name": name, "risk_group": risk_group, "type": type, "home_lab": home_lab, "owner": owner};
     console.log ("agwnr_data ", JSON.stringify(agent_data));
        return datastore.save({"key":key, "data":agent_data});
 }
@@ -492,7 +476,7 @@ function compare_keys_agent(req_body){
 }
 
 
-// formats and returns a lab
+// formats and returns an agent
 
 function pass_agent(agent, req){
     queryData = {
@@ -501,7 +485,7 @@ function pass_agent(agent, req){
        risk_group: agent[0].risk_group,
        type: agent[0].type,
        owner: agent[0].owner,
-       owner: agent[0].lab,
+       home_lab: agent[0].home_lab,
        self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + req.params.id 
    };
    return queryData;
@@ -529,7 +513,7 @@ function agent_params_ok (req){
 // Takes in parameters and saves agent entity in datastore
 //
 
-async function post_agent(name, lab, risk_group, type, owner, user){
+async function post_agent(name, home_lab, risk_group, type, owner, user){
     var noDupSci;
     console.log("user "+ JSON.stringify(user))
     
@@ -548,7 +532,7 @@ async function post_agent(name, lab, risk_group, type, owner, user){
     }
         
     var key = datastore.key(AGENT);
-	const new_agent = {"name": name,"lab": lab, "risk_group": risk_group, "type": type,  "owner":owner };
+	const new_agent = {"name": name,"home_lab": home_lab, "risk_group": risk_group, "type": type,  "owner":owner };
     await datastore.save({ "key": key, "data": new_agent });
     return key;
 }
@@ -577,7 +561,7 @@ function return_posted_agent_data(key, req){
         risk_group: req.body.risk_group,
         type: req.body.type,
         owner: req.user.sub,
-        lab: req.body.lab,
+        home_lab: req.body.home_lab,
         self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + key.id 
 };
 
@@ -654,19 +638,19 @@ async function which_agent_keys_to_update(req){
      //    
     //Check for lab
     //
-    if (typeof(reqBody.lab) ==='undefined'){
-        lab_var=agent[0].lab; 
+    if (typeof(reqBody.home_lab) ==='undefined'){
+        lab_var=agent[0].home_lab; 
     }
     //if array includes agent, load req param into variable
     else if (typeof(reqBody.agent) !=='undefined'){
-        lab_var =reqBody.lab;
+        lab_var =reqBody.home_lab;
     }
         //load new variables into the database
         console.log ("inside vars" +name_var+risk_group_var+type_var+lab_var);
         agent[0].name = name_var;
         agent[0].risk_group=risk_group_var;
         agent[0].type=type_var;
-        agent[0].lab=lab_var;
+        agent[0].home_lab=lab_var;
 
     console.log("agent[0] "+ JSON.stringify(agent[0]));
     return datastore.save({ "key": a_key, "data": agent[0] });
@@ -722,6 +706,11 @@ async function get_scientists(req){
     return results;
 }
 
+//**********************************************************************************/
+//          Error messages
+//**********************************************************************************/
+
+
 //custom error messages
 errorMsg = {
     msg_400 : function(){
@@ -732,6 +721,9 @@ errorMsg = {
     },
     msg_403: function(){
         return {"Error":"This is a violation of the uniqueness constraint"};
+    },
+    msg_403_agent_added: function(){
+        return {"Error":"Agent already has a home_lab"};
     },
     msg_405: function(){
         return {"Error":"Method cannot be used at this endpoint "};
@@ -758,6 +750,7 @@ errorMsg = {
 module.exports.msg_400=errorMsg.msg_400;
 module.exports.msg_400_w_n_p=errorMsg.msg_400_Wrong_num_of_P;
 module.exports.msg_403=errorMsg.msg_403;
+module.exports.msg_403_a_a=errorMsg.msg_403_agent_added
 //module.exports.msg_404=errorMsg.msg_404;
 module.exports.msg_405=errorMsg.msg_405;
 module.exports.msg_406=errorMsg.msg_406;
@@ -802,7 +795,10 @@ module.exports.ps=post_scientist;
 //module.exports.c_f_d=check_for_double
 
 //LAB PUT HELPERS
-module.exports.p_l_a=put_lab_agent;
+//put a lab in to an agent
+module.exports.p_sa_l=put_stored_agent_into_lab;
+//put an agent into a lab
+module.exports.put_hl_a=put_home_lab_into_agent;
 module.exports.count_k=count_keys;
 module.exports.put_l=put_lab;
 
