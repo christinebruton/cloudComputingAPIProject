@@ -25,6 +25,18 @@ router.get('/', function(req, res){
     });
 });
 
+
+//unallowed routes
+router.delete('/', function (req, res){
+    res.set('Accept', 'GET, POST');
+    res.status(405).end();
+  });
+  
+  router.put('/', function (req, res){
+    res.set('Accept', 'GET, POST');
+    res.status(405).end();
+  });
+
 /* ------------- End Controller Functions ------------- */
 
 module.exports = router

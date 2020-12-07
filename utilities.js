@@ -381,6 +381,7 @@ async function get_labs(req,owner){
     }
 	const entities = await datastore.runQuery(q);
     results.labs = entities[0].map(ds.fromDatastore).filter(item => item.owner === owner);
+    results.total_items = results.labs.length;
     if (entities[1].moreResults !== ds.Datastore.NO_MORE_RESULTS) {
         results.next = req.protocol + "://" + req.get("host") + req.baseUrl + "?cursor=" + entities[1].endCursor;
     }
@@ -421,12 +422,32 @@ function risk_group_validation(req){
     return found;
 }
 
+async function confirm_owner(id, owner ){
+
+    var owner_is_auth;
+    const key = datastore.key([LAB, parseInt(id, 10)]);
+    const owner_lab=await datastore.get(key)
+    console.log ("confirm owner:key ", JSON.stringify(key));
+    console.log("confirm_owner: oener_lab[0].owner "+JSON.stringify(owner_lab[0].owner)+"owner passed:"+ owner );
+    
+    if (owner_lab[0].owner == owner){
+        owner_is_auth=true;
+        
+    }
+   else if (owner_lab[0].owner == owner){
+    owner_is_auth= false;
+      }
+      return owner_is_auth;
+}
+
+
 //
 // INPUT VALIDATION
 // FOR LAB checks to make sure correct number of parameters have been included
 //
 
 function count_keys(req_body){
+    
     var key_array = Object.keys(req_body);
     //console.log("requested key array " + key_array );
     requested_key_num = key_array.length;
@@ -468,7 +489,7 @@ function count_keys_agent(req_body){
 //
 // LAB: which keys to update
 //
-async function which_keys_to_update(req){
+async function which_keys_to_update(req, owner){
     
     var key_array = Object.keys(req.body);
     var reqBody = req.body;
@@ -476,6 +497,10 @@ async function which_keys_to_update(req){
     const lab  = await datastore.get(l_key);
     var name_var, containment_level_var, square_footage_var, owner_var ;
     console.log ("which_keys_to_update: lab after datastore get "+ JSON.stringify(lab) )
+    
+    
+    
+    
     //    
     //Check for Name
     //
@@ -550,7 +575,7 @@ async function put_agent(res, id, name, risk_group, type, owner, home_lab){
 //-------------------------------------
 function compare_keys_agent(req_body){
     var key_array = JSON.stringify(Object.keys(req_body));
-    key_to_compare = {"name":"name", "lab":"lab","risk_group":"risk_group" , "type":"type" };
+    key_to_compare = {"name":"name", "home_lab":"home_lab","risk_group":"risk_group" , "type":"type" };
      
     var compare_key = JSON.stringify(Object.keys((key_to_compare)));
     console.log ("compare_keys_agent: key to compare against "+ compare_key + "from request "+ key_array )
@@ -674,6 +699,7 @@ async function get_agents(req,owner){
     }
 	const entities = await datastore.runQuery(q);
     results.agents = entities[0].map(ds.fromDatastore).filter(item => item.owner === owner);
+    results.total_items = results.agents.length;
     if (entities[1].moreResults !== ds.Datastore.NO_MORE_RESULTS) {
         results.next = req.protocol + "://" + req.get("host") + req.baseUrl + "?cursor=" + entities[1].endCursor;
     }
@@ -812,7 +838,7 @@ errorMsg = {
         return {"Error":"Missing or invalid JWT"};
     },
     msg_403: function(){
-        return {"Error":"Unauthorized"};
+        return {"Error":"Forbidden"};
     },
     msg_403_u_lab: function(){
         return {"Error":"Name of lab must be unique"};
@@ -843,6 +869,7 @@ errorMsg = {
 
 // Error messages
 module.exports.msg_400=errorMsg.msg_400;
+module.exports.msg_401=errorMsg.msg_401;
 module.exports.msg_400_w_n_p=errorMsg.msg_400_Wrong_num_of_P;
 module.exports.msg_403=errorMsg.msg_403;
 module.exports.msg_403_u_l=errorMsg.msg_403_u_lab;
@@ -906,3 +933,4 @@ module.exports.put_l=put_lab;
 
 //LAB PATCH HELPERS
 module.exports.which_k=which_keys_to_update;
+module.exports.co=confirm_owner;

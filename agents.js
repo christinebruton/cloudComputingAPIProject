@@ -142,7 +142,7 @@ router.get('/', checkJwt, function(req, res){
                     };
                     console.log("agent.name "+ agent['name'])
                     //res.status(303)
-                    res.status(200).json(queryData);
+                    res.status(204).json(queryData);
         }
           else if (err){
           console.log ("PUT: There was an error in dayast")
@@ -200,7 +200,7 @@ router.get('/', checkJwt, function(req, res){
                       self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + agent_key.id 
                   };
                   console.log("agent.name "+ agent['name'])
-                       res.status(200).json(queryData);
+                       res.status(204).json(queryData);
                    }
                //console.log(JSON.stringify(ret_boat))
                else if (err){
@@ -230,6 +230,7 @@ router.get('/:agent_id', checkJwt, function(req, res, next){
   console.log ("in get: agent id key " + JSON.stringify(agent_key));
  
   u.check(agent_key).then( agent =>{
+
     //confirm owner is correct
    console.log(u.oc(agent, req.user.sub));
     console.log("get/:agent_id. JWT id " + req.user.sub + " agent owner from db "+ agent[0].owner);
@@ -251,21 +252,38 @@ router.delete('/:agent_id', checkJwt, function(req, res, err){
   const key = datastore.key([AGENT, parseInt(req.params.agent_id,10)]);
 
   u.check(key).then((agent)=>{
-    console.log('In router.delete  ' + JSON.stringify(agent[0].owner) + "user id " +req.user.sub );  
-   
-    if (agent ===null || typeof agent === 'undefined'){
-      res.status(403).send(u.msg_403());
-      console.log ("it's null");
-    }else  if (agent[0].owner != req.user.sub)  {
-      res.status(401).send(u.msg_401());
-    }else {
-      u.delete_a(key).then(res.status(204).end())
-    }
+
+    if (agent.owner == req.user.sub){
+
+        console.log('In router.delete  ' + JSON.stringify(agent[0].owner) + "user id " +req.user.sub );  
+      
+        if (agent ===null || typeof agent === 'undefined'){
+          res.status(403).send(u.msg_403());
+          console.log ("it's null");
+        }else  if (agent[0].owner != req.user.sub)  {
+          res.status(401).send(u.msg_401());
+        }else {
+          u.delete_a(key).then(res.status(204).end())
+        }
+      }else{
+        res.status(403).send(u.msg_403()); 
+      }
   }).catch((err)=>{
     console.log('In router.delete  caught ' + err); 
     res.status(502).send(u.msg_502());
 }); 
  
+});
+
+//unallowed routes
+router.delete('/', function (req, res){
+  res.set('Accept', 'GET, POST');
+  res.status(405).end();
+});
+
+router.put('/', function (req, res){
+  res.set('Accept', 'GET, POST');
+  res.status(405).end();
 });
 
 

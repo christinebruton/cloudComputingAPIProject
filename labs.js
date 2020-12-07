@@ -172,47 +172,47 @@ router.put('/:lab_id', checkJwt, function(req, res){
 router.patch('/:lab_id', checkJwt, function(req, res){
   console.log ("PATCH LAB")
   const lab_key = datastore.key([LAB, parseInt(req.params.lab_id,10)]);
+
+  datastore.get(lab_key, (err, lab)=>{
+    console.log ("PATCH after datastore.get lab " + JSON.stringify(lab));
+    if (lab.owner != req.user.sub){
+      res.status(403).send(u.msg_403()); 
+    }else {
+
+
+      var valid_input; 
+      switch (u.count_k(req.body, lab_key)){
+       case 1:
+           valid_input = false;
+           break;
+       case 2:
+           valid_input =false;
+           break;
+       case 3:
+           valid_input=true;
+           break;
+       default:
+           valid_input=true;
+      } if (valid_input == false){
+          res.status(400).send(u.msg_400());
+      }else if (valid_input == true){
+          //the request is valid, update parameters
+          u.which_k(req, req.user.sub).then( 
+             res.status(204).end()
+         //  })
+          )
+      }
+
+
+
+
+    }
+
+
+  })
+
+
   
-   var valid_input; 
-       switch (u.count_k(req.body)){
-        case 1:
-            valid_input = false;
-            break;
-        case 2:
-            valid_input =false;
-            break;
-        case 3:
-            valid_input=true;
-            break;
-        default:
-            valid_input=true;
-       } if (valid_input == false){
-           res.status(400).send(u.msg_400());
-       }else if (valid_input == true){
-           //the request is valid, update parameters
-           u.which_k(req).then(
-               //datastore.get(lab_key,(err, lab)=>{
-              //     if (!err){
-              //       queryData = {
-              //         id: lab_key.id,
-              //         name: lab.name,
-              //         containment_level: lab.containment_level,
-              //         square_footage: lab.square_footage,
-              //         stored_agents: lab.stored_agents,
-              //         owner:lab.owner,
-              //         self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + lab_key.id 
-              //     };
-              //          console.log("PATCH LAB: lab.name "+ lab.name)
-              //         res.status(200).json(queryData);
-              //     }
-              // else if (err){
-               // console.log ("PUT: There was an error in datastore")
-              //  res.status(502).send(u.msg_502())
-              // } 
-              res.status(204).end()
-          //  })
-           )
-       }
    });
 
 
@@ -360,6 +360,8 @@ router.delete('/:lab_id', checkJwt, function(req, res, err){
   const key = datastore.key([LAB, parseInt(req.params.lab_id,10)]);
 
   u.check(key).then((lab)=>{
+    console.log("In router.delete lab.owner "+ lab[0].owner +"req.user.sub "+ req.user.sub)
+    if (lab[0].owner == req.user.sub){
     console.log('In router.delete  ' + JSON.stringify(lab[0].owner) + "user id " +req.user.sub );  
    
     if (lab ===null || typeof lab === 'undefined'){
@@ -370,6 +372,9 @@ router.delete('/:lab_id', checkJwt, function(req, res, err){
     }else {
       u.delete_l(key).then(res.status(204).end())
     }
+  }else{
+    res.status(403).send(u.msg_403()); 
+  }
   //error thrown from check
   }).catch((err)=>{
     console.log('In router.delete  caught ' + err); 
@@ -378,6 +383,16 @@ router.delete('/:lab_id', checkJwt, function(req, res, err){
  
 });
 
+//unallowed routes
+router.delete('/', function (req, res){
+  res.set('Accept', 'GET, POST');
+  res.status(405).end();
+});
+
+router.put('/', function (req, res){
+  res.set('Accept', 'GET, POST');
+  res.status(405).end();
+});
 
 
   /* ------------- End Controller Functions ------------- */

@@ -75,6 +75,16 @@ app.use(function (err, req, res, next) {
       console.log ("UnauthorizedError: POST");
       res.status(401).send({'Error' : 'Missing or invalid JWT'});
     }
+      //PUT: unauthorized token 
+      else if (err.name === 'UnauthorizedError' && req.method == "PUT" ) {
+        console.log ("UnauthorizedError: PUT");
+        res.status(401).send({'Error' : 'Missing or invalid JWT'});
+      }
+       //PATCH: unauthorized token 
+       else if (err.name === 'UnauthorizedError' && req.method == "PATCH" ) {
+        console.log ("UnauthorizedError: PATCH");
+        res.status(401).send({'Error' : 'Missing or invalid JWT'});
+      }
     //other errors
     else {
       console.error(err.stack)
