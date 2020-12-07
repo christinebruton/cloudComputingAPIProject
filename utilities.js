@@ -373,7 +373,9 @@ return resData;
 //
 
 async function get_labs(req,owner){
-
+    var qt = datastore.createQuery(LAB);
+    const totalresults = await datastore.runQuery(qt);
+    console.log ("totalresults length "+ totalresults[0].length);
     var q = datastore.createQuery(LAB).limit(5);
     const results = {};
     if(Object.keys(req.query).includes("cursor")){
@@ -381,7 +383,7 @@ async function get_labs(req,owner){
     }
 	const entities = await datastore.runQuery(q);
     results.labs = entities[0].map(ds.fromDatastore).filter(item => item.owner === owner);
-    results.total_items = results.labs.length;
+    results.total_items = totalresults[0].length;
     if (entities[1].moreResults !== ds.Datastore.NO_MORE_RESULTS) {
         results.next = req.protocol + "://" + req.get("host") + req.baseUrl + "?cursor=" + entities[1].endCursor;
     }
@@ -691,7 +693,9 @@ return resData;
 //
 
 async function get_agents(req,owner){
-
+    var qt = datastore.createQuery(AGENT);
+    const totalresults = await datastore.runQuery(qt);
+    console.log ("totalresults length "+ totalresults[0].length);
     var q = datastore.createQuery(AGENT).limit(5);
     const results = {};
     if(Object.keys(req.query).includes("cursor")){
@@ -699,7 +703,7 @@ async function get_agents(req,owner){
     }
 	const entities = await datastore.runQuery(q);
     results.agents = entities[0].map(ds.fromDatastore).filter(item => item.owner === owner);
-    results.total_items = results.agents.length;
+    results.total_items = totalresults[0].length;
     if (entities[1].moreResults !== ds.Datastore.NO_MORE_RESULTS) {
         results.next = req.protocol + "://" + req.get("host") + req.baseUrl + "?cursor=" + entities[1].endCursor;
     }
@@ -811,6 +815,10 @@ async function scientist_find(owner){
 
 
 async function get_scientists(req){
+
+    var qt = datastore.createQuery(SCIENTIST);
+    const totalresults = await datastore.runQuery(qt);
+    console.log ("totalresults length "+ totalresults[0].length)
     var q = datastore.createQuery(SCIENTIST).limit(5);
     const results = {};
     if(Object.keys(req.query).includes("cursor")){ //if there is a cursor
@@ -818,6 +826,7 @@ async function get_scientists(req){
     }
     const entities = await datastore.runQuery(q);
     results.all_scientists = entities[0];
+    results.total_items = totalresults[0].length
     if (entities[1].moreResults !== ds.Datastore.NO_MORE_RESULTS) {
         results.next = req.protocol + "://" + req.get("host") + req.baseUrl + "?cursor=" + entities[1].endCursor;
     }

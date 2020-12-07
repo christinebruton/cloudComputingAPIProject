@@ -317,14 +317,15 @@ router.get('/', checkJwt, function(req, res){
       res.status (406).send(u.msg_406())
   }else {
 
-  // get owner's labs
-  console.log ("In GET/labs")
-  const labs = u.gls(req, req.user.sub) 
- // const labs = u.gls(req.user.sub)
-.then( (labs) => {
-      res.status(200).json(labs);
-  });
-}
+    
+   // get owner's labs
+   console.log ("In GET/labs")
+   const labs = u.gls(req, req.user.sub) 
+  // const labs = u.gls(req.user.sub)
+  .then( (labs) => {
+        res.status(200).json(labs);
+    });
+  }
 });
 
 
@@ -332,22 +333,35 @@ router.get('/', checkJwt, function(req, res){
 //get lab by ID
 //
 router.get('/:lab_id', checkJwt, function(req, res, next){
-   console.log ("in get/lab id " + req.params.lab_id)
+  const accepts = req.accepts(['application/json']);
+  console.log ("accepts is "+ accepts)
+  if (!accepts){
+      console.log("GET: request is not of acceptable type")
+      res.status (406).send(u.msg_406())
+  }else {
+  
+  console.log ("in get/lab id " + req.params.lab_id)
    const lab_key = datastore.key([LAB, parseInt(req.params.lab_id,10)]);
    console.log ("in get: lab id key " + JSON.stringify(lab_key));
+
   
    u.check(lab_key).then( lab =>{
-    queryData = {
-      id: req.params.lab_id,
-      name: lab[0]['name'],
-      containment_level: lab[0].containment_level,
-      square_footage: lab[0].square_footage,
-      stored_agents: lab[0].stored_agents, 
-      owner:lab[0].owner,
-      self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + req.params.id 
-  };
+    if (lab[0].owner == req.user.sub){
+        queryData = {
+          id: req.params.lab_id,
+          name: lab[0]['name'],
+          containment_level: lab[0].containment_level,
+          square_footage: lab[0].square_footage,
+          stored_agents: lab[0].stored_agents, 
+          owner:lab[0].owner,
+          self: req.protocol + "://"+ req.get("host") + req.baseUrl + "/" + req.params.id 
+      };
      res.status(200).json(queryData);
-  });    
+    }else if (lab[0].owner != req.user.sub) {
+      res.status(403).send(u.msg_403());
+    }
+  }); 
+}   
 });
 
 

@@ -228,20 +228,29 @@ router.get('/:agent_id', checkJwt, function(req, res, next){
   const agent_key = datastore.key([AGENT, parseInt(req.params.agent_id,10)]);
   
   console.log ("in get: agent id key " + JSON.stringify(agent_key));
- 
+  const accepts = req.accepts(['application/json']);
+  console.log ("accepts is "+ accepts)
+  if (!accepts){
+      console.log("GET: request is not of acceptable type")
+      res.status (406).send(u.msg_406())
+  }else {
   u.check(agent_key).then( agent =>{
+      if (agent[0].owner==req.user.sub){
 
-    //confirm owner is correct
-   console.log(u.oc(agent, req.user.sub));
-    console.log("get/:agent_id. JWT id " + req.user.sub + " agent owner from db "+ agent[0].owner);
-    console.log("in get: returned agent " + JSON.stringify(agent) );
-    //return formatted agent
-    res.status(200).json(u.pass_a(agent, req));
- });    
-});
+            //confirm owner is correct
+            // console.log(u.oc(agent, req.user.sub));
+            console.log("get/:agent_id. JWT id " + req.user.sub + " agent owner from db "+ agent[0].owner);
+            console.log("in get: returned agent " + JSON.stringify(agent) );
+            //return formatted agent
+            res.status(200).json(u.pass_a(agent, req));
 
-
-
+            }else if (agent[0].owner != req.user.sub) {
+              res.status(403).send(u.msg_403());
+            }
+  
+        });    
+      }
+   });
 
 //
 // delete agent
