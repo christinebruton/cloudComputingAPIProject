@@ -262,7 +262,7 @@ router.delete('/:agent_id', checkJwt, function(req, res, err){
 
   u.check(key).then((agent)=>{
 
-    if (agent.owner == req.user.sub){
+    if (agent[0].owner == req.user.sub){
 
         console.log('In router.delete  ' + JSON.stringify(agent[0].owner) + "user id " +req.user.sub );  
       

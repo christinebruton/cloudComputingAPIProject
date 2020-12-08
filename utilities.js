@@ -85,7 +85,7 @@ async function check_if_entity_exists(keyObj){
 //-------------------------------------
 function compare_keys(req_body){
     var key_array = JSON.stringify(Object.keys(req_body));
-    key_to_compare = {"name":"name", "containment_level":"containment_level" , "square_footage":"square_footage"};
+    key_to_compare = {"name":"name", "containment_level":"containment_level" , "stored_agents":"stored_agents", "square_footage":"square_footage"};
      
     var compare_key = JSON.stringify(Object.keys((key_to_compare)));
     console.log ("compare_keys: key to compare against "+ compare_key + "from request "+ key_array )
@@ -165,6 +165,7 @@ async function put_home_lab_into_agent(l_id, a_id){
     const a_key = datastore.key([AGENT, parseInt(a_id,10)]);
     const l_key = datastore.key([LAB, parseInt(l_id,10)]);
     const agent = await datastore.get(a_key);
+   
     agent[0].home_lab.id = l_id;
     console.log("put_agent_lab after agent[0].home_lab.id " + JSON.stringify(agent));
     return datastore.save({ "key": a_key, "data": agent[0] });
@@ -213,10 +214,6 @@ async function delete_a_stored_agent_from_entity(l_id, agent_to_delete){
 
 }
 
-
-
-
-
 //-------------------------------------
 // put_lab: Helper functions to save all parameters
 // in the datastore
@@ -225,16 +222,17 @@ async function delete_a_stored_agent_from_entity(l_id, agent_to_delete){
 
 async function put_lab(id, name, containment_level, square_footage, owner){
     const key = datastore.key([LAB, parseInt(id, 10)]);
-    console.log ("put_lab:key ", JSON.stringify(key));
 
     const owner_lab=await datastore.get(key)
     console.log("Put_lab owner_lab.owner:"+JSON.stringify(owner_lab[0].owner)+"owner passed:"+ owner );
-    
+    console.log ("put_lab:lab stored_agents ", JSON.stringify(owner_lab[0]));
+
+  
     
    if (owner_lab[0].owner == owner){
     console.log("Put_lab owner_lab.owner:"+JSON.stringify(owner_lab[0].owner)+"owner passed:"+ owner );
   
-    const lab_data = {"name": name, "containment_level": containment_level, "square_footage": square_footage, "owner": owner};
+    const lab_data = {"name": name, "containment_level": containment_level,"stored_agents":owner_lab[0].stored_agents, "square_footage": square_footage, "owner": owner};
     datastore.save({"key":key, "data":lab_data});
    }else {
     console.log("------->CANNOT PUT:Put_lab owner_lab.owner:"+JSON.stringify(owner_lab[0].owner)+"owner passed:"+ owner );
@@ -563,8 +561,11 @@ async function which_keys_to_update(req, owner){
 
 async function put_agent(res, id, name, risk_group, type, owner, home_lab){
     const key = datastore.key([AGENT, parseInt(id, 10)]);
-    console.log ("key ", JSON.stringify(key))
-    const agent_data = {"name": name, "risk_group": risk_group, "type": type, "home_lab": home_lab, "owner": owner};
+    const agent  = await datastore.get(key);
+    console.log ("put_agent: agent "+ JSON.stringify(agent) );
+    console.log ("key ", JSON.stringify(key));
+    //agent will not be added
+    const agent_data = {"name": name, "risk_group": risk_group, "type": type, "home_lab": agent[0].home_lab, "owner": owner};
     console.log ("agwnr_data ", JSON.stringify(agent_data));
        return datastore.save({"key":key, "data":agent_data});
 }
@@ -577,7 +578,7 @@ async function put_agent(res, id, name, risk_group, type, owner, home_lab){
 //-------------------------------------
 function compare_keys_agent(req_body){
     var key_array = JSON.stringify(Object.keys(req_body));
-    key_to_compare = {"name":"name", "home_lab":"home_lab","risk_group":"risk_group" , "type":"type" };
+    key_to_compare = {"name":"name", "home_lab":"home_lab","risk_group":"risk_group" ,"type":"type" };
      
     var compare_key = JSON.stringify(Object.keys((key_to_compare)));
     console.log ("compare_keys_agent: key to compare against "+ compare_key + "from request "+ key_array )

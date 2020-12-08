@@ -1,0 +1,3054 @@
+{
+	"info": {
+		"_postman_id": "410905b1-f332-4a29-9deb-044f442e1ead",
+		"name": "brutonc_project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET scientists no id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f1647df-99f3-4b53-b2da-66244b6f9983",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/scientists",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"scientists"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "*CHOOSE NEW NAME*CREATE LAB [LID][user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5e5d83f0-512e-42bd-b555-5b5a8caae033",
+						"exec": [
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.environment.set(\"first_lab_name\", pm.response.json()[\"name\"]);",
+							"pm.environment.set(\"lab_id\", pm.response.json()[\"id\"]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"x Lab [lab_id]\",\n    \"containment_level\":\"BSL2\", \n    \"stored_agents\": [],\n    \"square_footage\":5000\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE LAB 400 error *wrong containment level*  [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ef237a4e-33de-44d0-bc12-af9f4d009520",
+						"exec": [
+							"",
+							"pm.test(\"400 status code\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"California Bio Lab\",\n    \"containment_level\":\"BSL200\",\n    \"square_footage\":15000\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE LAB 400 error *wrong square footage type* [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e644c276-e9bf-40e4-836f-ae16a66bf7f3",
+						"exec": [
+							"",
+							"pm.test(\"400 status code\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"California Bio Lab\",\n    \"containment_level\":\"BSL2\",\n    \"square_footage\":\"2000\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE LAB 400 error *missing parameter*  [lab user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "293b1527-5155-4a8d-914e-b861b2afc8e1",
+						"exec": [
+							"",
+							"pm.test(\"400 status code\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"California Bio Lab\",\n    \"type\":\"Yatch\",\n    \"square_footage\":2000\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE LAB 403 error *Duplicate lab name* [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "06158ffc-2790-4f22-8bb8-dc4fa5249c89",
+						"exec": [
+							"",
+							"pm.test(\"403 status code\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"{{first_lab_name}}\",\n    \"containment_level\":\"BSL2\",\n    \"square_footage\":2000\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /lab [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bc977ef8-dc32-4c86-a2d7-482e1a6a6700",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    ",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /lab 403 error wrong user  [user_id2 jwt2]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6ddb3630-f4bd-4a06-9c57-e69eda7a5a47",
+						"exec": [
+							"",
+							"pm.test(\"403 status code\", function () {",
+							"    pm.response.to.have.status(403);",
+							"    ",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /:labs 406 error not acceptable type [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cf409aa2-921d-4fd2-9189-037b2f663fe9",
+						"exec": [
+							"",
+							"pm.test(\"406 status code\", function () {",
+							"    pm.response.to.have.status(406);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/atom+xml",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}?Accept=application/atom+xml",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					],
+					"query": [
+						{
+							"key": "Accept",
+							"value": "application/atom+xml"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "*user 1* GET /labs valid id [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "414989c9-550e-48df-8347-58f55f3738a8",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "*user 2 * GET /labs valid id [user_id2 jwt2]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "24dd1f44-ee1d-4edd-a50d-658c00a1d9d5",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "*CHOOSE NEW NAME* CREATE NEW LAB [LID2] [user_id2  jwt2]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5678b9f2-2cf6-458c-bdb3-a2f2fba3bebf",
+						"exec": [
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.environment.set(\"second_lab_name\", pm.response.json()[\"name\"]);",
+							"pm.environment.set(\"lab_id_2\", pm.response.json()[\"id\"]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"Gretchen's Lab [lab_id_2]\",\n    \"containment_level\":\"BSL2\", \n    \"stored_agents\": [],\n    \"square_footage\":5000\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					]
+				},
+				"description": "Posts a lab for user 2"
+			},
+			"response": []
+		},
+		{
+			"name": "*user 2 * GET /labs valid id [user_id2 jwt2]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a94562d0-3d3f-4709-9e84-754ccef0984f",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "*user 1* GET /labs valid id [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3cfbc6cc-227b-4d63-8721-693a48b2e9ac",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /:labs 406 error not acceptable type [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bdc73f9b-1e83-418d-bff2-d7691f09b933",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(406);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/atom+xml",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{app_url}}/labs?Accept=application/atom+xml",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					],
+					"query": [
+						{
+							"key": "Accept",
+							"value": "application/atom+xml"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /:labs 405 error not allowed  [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fca1957b-83a1-4658-b7c7-6878a3676778",
+						"exec": [
+							"",
+							"pm.test(\"405 status code\", function () {",
+							"    pm.response.to.have.status(405);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/atom+xml"
+					}
+				],
+				"url": {
+					"raw": "{{app_url}}/labs",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE LAB [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "21f90719-8614-44a4-9a3a-81f1ae7951a7",
+						"exec": [
+							"",
+							"pm.test(\"204 status code\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"Slade's updated Lab\",\n    \"containment_level\":\"BSL1\",\n    \"stored_agents\": [],\n    \"square_footage\":1000\n\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /lab to confirm PUT [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f535a293-e1ce-461e-a004-869ec57fafe4",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    ",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE LAB 401 error *invalid jwt* [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c3a78a57-c48a-4fcd-97b4-9de5970f9dbb",
+						"exec": [
+							"",
+							"pm.test(\"401 status code\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{invalidjwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"Slade's updated Lab\",\n    \"containment_level\":\"BSL1\",\n    \"stored_agents\": [],\n    \"square_footage\":1000\n\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE LAB  403 error *wrong user* [user_id2 jwt2]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2b704943-c437-46f0-83b1-3b9cde89bef4",
+						"exec": [
+							"",
+							"pm.test(\"403 status code\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"Slade's updated Lab\",\n    \"containment_level\":\"BSL1\",\n    \"stored_agents\": [],\n    \"square_footage\":1000\n\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE LAB [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "db754080-8323-451e-b3ec-1d879fc17803",
+						"exec": [
+							"",
+							"pm.test(\"204 status code\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"Updated Gretchen's Lab\",\n    \"containment_level\":\"BSL2\", \n    \"square_footage\":5000\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /lab to confirm patch [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d01cf490-a8f9-4cce-9a32-a88c64f1fdd6",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE LAB 400 error [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "96276258-579c-4d5d-b95b-e21636b7c7b6",
+						"exec": [
+							"",
+							"pm.test(\"400 status code\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"Gretchen's Lab\",\n    \"containment_level\":\"BSL2\", \n    \"stored_agents\": [],\n    \"square_footage\":5000\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE LAB 401 error *invalid jwt* [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2307d362-403e-45bf-bb6d-a2057f2e2f9b",
+						"exec": [
+							"",
+							"pm.test(\"401 status code\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{invalidjwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"Slade, Gretch and Jo's Lab\",\n    \"containment_level\":\"BSL2\"\n  \n\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE LAB 403 error *wrong user* [user_id2  jwt2]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "24961a83-a8be-46c1-a92f-e5681ec47a74",
+						"exec": [
+							"",
+							"pm.test(\"403 status code\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"Slade, Gretch and Jo's Lab\",\n    \"containment_level\":\"BSL2\"\n  \n\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE lab 204 lab_id [user_id1 ]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "40cf506c-29d1-4f56-97ff-50ebdb072850",
+						"exec": [
+							"pm.test(\"204 status code\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE lab 204 lab_id_2 [user_id2 ]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "294acc7e-3122-4cad-b63b-d2d038094ff9",
+						"exec": [
+							"pm.test(\"204 status code\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id_2}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id_2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "*CHOOSE NEW NAME* CREATE NEW LAB [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5e5c1dbe-a1e2-4156-9733-ba6ef495d1f9",
+						"exec": [
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.environment.set(\"third_lab_name\", pm.response.json()[\"name\"]);",
+							"pm.environment.set(\"lab_id_3\", pm.response.json()[\"id\"]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"Donnie's Lab [lab_id_3]\",\n    \"containment_level\":\"BSL2\", \n    \"stored_agents\": [],\n    \"square_footage\":5000\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE LAB 403 error *wrong user*  [user_id1 jwt1]",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE lab 401 error * missing or invalid JWTs* [user1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "17a5f568-37e3-4308-a182-709bc109c120",
+						"exec": [
+							"",
+							"pm.test(\"401 status code\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{invalid_auth}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE lab 502 error *invalid lab_id [jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "29649f7e-62d6-428c-b58f-4521ba5dcf85",
+						"exec": [
+							"",
+							"pm.test(\"502 status code\", function () {",
+							"    pm.response.to.have.status(502);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs/{{invalid_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{invalid_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE AGENT [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4cbb5d16-0515-4ff6-8544-23d3b8732597",
+						"exec": [
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.environment.set(\"first_agent_name\", pm.response.json()[\"name\"]);",
+							"pm.environment.set(\"agent_id\", pm.response.json()[\"id\"]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"E\",\n  \"home_lab\": {\n      \"id\": null\n  },\n  \"risk_group\": \"RG3\",\n  \"type\": \"virus\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/agents",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /:agent_id valid id [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "27388947-dee7-4030-bb8f-fbc80e994649",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /:labs 406 error not acceptable type [user_id1 jwt1] Copy 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5bdcb71c-58d7-4d3e-92c3-2ea9769893dd",
+						"exec": [
+							"",
+							"pm.test(\"406 status code\", function () {",
+							"    pm.response.to.have.status(406);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/atom+xml",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id}}?Accept=application/atom+xml",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id}}"
+					],
+					"query": [
+						{
+							"key": "Accept",
+							"value": "application/atom+xml"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /agent 403 error *wrong user*  [user_id2 jwt2]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0e5f0fdd-6170-489c-872f-5250249cab5b",
+						"exec": [
+							"",
+							"pm.test(\"403 status code\", function () {",
+							"    pm.response.to.have.status(403);",
+							"    ",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE AGENT [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ea7b64d3-9b5b-4b72-9244-14e045ce953f",
+						"exec": [
+							"",
+							"pm.test(\"204 status code\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"mad virus\",\n  \"home_lab\": {\n      \"id\": null\n  },\n  \"risk_group\": \"RG3\",\n  \"type\": \"virus\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /:agent_id valid id [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "59cbb913-a363-4061-a9d4-359e228ff0fa",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE AGENT [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7c0055b3-04c8-400b-b661-4cd732a3c163",
+						"exec": [
+							"",
+							"pm.test(\"204 status code\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"mad virus\",\n  \"risk_group\": \"RG3\",\n  \"type\": \"virus\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /:agent_id valid id [user_id1 jwt1] Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c3e553c8-f200-4330-8bf3-52bebe376840",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE AGENT 401 error *invalid jwt*  [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "31a2b136-4c2d-407e-b081-01f9bcd64893",
+						"exec": [
+							"",
+							"pm.test(\"401 status code\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{invalidjwt}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"ebola virus\",\n  \"home_lab\": {\n      \"id\": null\n  },\n  \"risk_group\": \"RG3\"\n\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE AGENT 400 error *too many* fields [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5910ad74-9e44-4e7c-8cf7-ccc7394e715e",
+						"exec": [
+							"",
+							"pm.test(\"400 status code\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"E\",\n  \"home_lab\": {\n      \"id\": null\n  },\n  \"risk_group\": \"RG3\",\n  \"type\": \"virus\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /:agent_id valid id [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e0934c7f-b572-4b48-acad-a9a02acf767b",
+						"exec": [
+							"",
+							"pm.test(\"204 status code\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE AGENT 400 error *wrong risk group*  [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9509d80f-2f7a-457f-a63f-4fc90a2c4785",
+						"exec": [
+							"",
+							"pm.test(\"400 status code\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"5635008819625984\",\n    \"name\": \"SARS CoV-2 virus\",\n    \"risk_group\": \"RG70\",\n    \"type\": \"virus\",\n    \"owner\": \"auth0|5fc1bab71bda000075e1e3fc\",\n    \"lab\": {\n        \"id\": null\n    },\n    \"self\": \"http://localhost:8080/agents/5635008819625984\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE AGENT 400 error *missing parameter* [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "209a4126-b3e5-4a2c-8d55-1f1aed2319e9",
+						"exec": [
+							"",
+							"pm.test(\"400 status code\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"SARS CoV-2 virus\",\n  \"lab\": {\n      \"id\": null\n  },\n  \"risk_group\": \"RG3\"\n \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/agents",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "*CHOOSE NEW NAME* CREATE NEW LAB for relationship [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d6456941-fdab-417f-b30a-afe0e7618a4d",
+						"exec": [
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.environment.set(\"fifth_lab_name\", pm.response.json()[\"name\"]);",
+							"pm.environment.set(\"lab_id_5\", pm.response.json()[\"id\"]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"JoJos's Lab [lab_id_5]\",\n    \"containment_level\":\"BSL2\", \n    \"stored_agents\": [],\n    \"square_footage\":5000\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE AGENT for relationship [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c449d30d-158f-451c-b7c9-ab9ffbca9e3c",
+						"exec": [
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.environment.set(\"agent_id_2\", pm.response.json()[\"id\"]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"good cells [agent_id_2]\",\n  \"home_lab\": {\n      \"id\": null\n  },\n  \"risk_group\": \"RG3\",\n  \"type\": \"virus\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/agents",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE LAB_AGENT RELATIONSHIP [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b172b92b-d1b1-40c3-a274-699df63a65e9",
+						"exec": [
+							"",
+							"pm.test(\"204 status code\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id_5}}/agents/{{agent_id_2}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id_5}}",
+						"agents",
+						"{{agent_id_2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE LAB_AGENT RELATIONSHIP 403 error wrong id  [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "35d2531a-7709-4e1d-8329-7657e51b527f",
+						"exec": [
+							"",
+							"pm.test(\"403 status code\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"DNA Lab\",\n    \"containment_level\":\"BSL2\",\n    \"square_footage\":5000,\n    \"agent\": {\n                \"id\": \"test_id\"\n            }\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id_5}}/agents/{{agent_id_2}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id_5}}",
+						"agents",
+						"{{agent_id_2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE LAB_AGENT RELATIONSHIP 401 error  [invalid jwt]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d19784ea-49bf-4cce-8f7a-d2fb6d19a78f",
+						"exec": [
+							"",
+							"pm.test(\"401 status code\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{invalidjwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"DNA Lab\",\n    \"containment_level\":\"BSL2\",\n    \"square_footage\":5000,\n    \"agent\": {\n                \"id\": \"test_id\"\n            }\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id_5}}/agents/{{agent_id_2}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id_5}}",
+						"agents",
+						"{{agent_id_2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /lab to confirm PUT Relationship [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "669ccfc9-7150-48be-999b-214c4da3dd79",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"  ",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id_5}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id_5}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET agent to confirm PUT Relationship  [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0a78b62d-ec73-4e5a-a331-d44daec879ae",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id_2}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id_2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE LAB_AGENT RELATIONSHIP 403 error [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7101e6f0-b9a8-4f8a-9541-683d663fb034",
+						"exec": [
+							"",
+							"pm.test(\"403 status code\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id_5}}/agents/{{agent_id_2}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id_5}}",
+						"agents",
+						"{{agent_id_2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /lab to confirm DELETE Relationship [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "db60acc0-1eee-41e9-983b-9a0560897606",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id_5}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id_5}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET agent to confirm DELETE Relationship  [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fdf7eb35-49e0-47ea-997d-d3d9e9239e5c",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id_2}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id_2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE AGENT for user2 [user_id2 jwt2]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "661c1a52-250a-47e6-8563-90e7cc6390c9",
+						"exec": [
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.environment.set(\"second_agent_name\", pm.response.json()[\"name\"]);",
+							"pm.environment.set(\"agent_id_6\", pm.response.json()[\"id\"]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"User2 cells juice [agent_id_6]\",\n  \"home_lab\": {\n      \"id\": null\n  },\n  \"risk_group\": \"RG3\",\n  \"type\": \"virus\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/agents",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /agents valid id [user_id2 jwt2]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ae341b3-3e35-45b9-8235-26ad2f06d840",
+						"exec": [
+							"",
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/agents",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE AGENT (agent_id_7) for delete [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a442cae2-f9ec-488b-a27c-883760b4d367",
+						"exec": [
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.environment.set(\"third_agent_name\", pm.response.json()[\"name\"]);",
+							"pm.environment.set(\"agent_id_7\", pm.response.json()[\"id\"]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Ebola virus\",\n  \"home_lab\": {\n      \"id\": null\n  },\n  \"risk_group\": \"RG3\",\n  \"type\": \"virus\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/agents",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /:agent_id valid id AID6 [user_id2 jwt2]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "909fcfbe-5043-4197-8614-599defe6831e",
+						"exec": [
+							"",
+							"pm.test(\"204 status code\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id_6}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id_6}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /lav valid id LID5 [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bcbb0980-1f88-47b8-97b0-4a250d052031",
+						"exec": [
+							"",
+							"pm.test(\"204 status code\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id_5}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id_5}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /:agent_id valid id AID7 [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "80d39c0d-f4f4-4561-ab82-486124b87949",
+						"exec": [
+							"",
+							"pm.test(\"204 status code\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id_7}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id_7}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /:agent_id valid id AID2 [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "76f63d42-a37d-4c75-b56c-f4263e27a741",
+						"exec": [
+							"",
+							"pm.test(\"204 status code\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/agents/{{agent_id_2}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"agents",
+						"{{agent_id_2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /lab valid id LID3 [user_id1 jwt1]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a004aff8-e1cd-42a8-a7c8-13538dfc1513",
+						"exec": [
+							"",
+							"pm.test(\"204 status code\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/labs/{{lab_id_3}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"labs",
+						"{{lab_id_3}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
